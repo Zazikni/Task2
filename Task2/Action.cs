@@ -19,16 +19,16 @@ namespace Task2
     }
     internal class Action
     {
-        public SocietyElement? Subject {  get; }
+        public SocietyElement? Subject { get; set; }
         public Storage? UploadFrom {  get; }
         public Storage? UploadTo {  get; }
         public IItem? Receive {  get; }
         public Place? GoFrom {  get; }
         public Place? GoTo { get; }
         public string Time { get; }
-        public SocietyElement Object {  get; }
-        public Actions Act { get; }
-        public Action(SocietyElement obj, Actions action, Storage? uploadTo = null, Storage? uploadFrom = null, string time = "", Place? goFrom = null, Place? goTo = null, IItem? receive = null) 
+        public INameable? Object {  get; }
+        public Actions? Act { get; }
+        public Action( Actions? action = null, INameable obj = null, Storage? uploadTo = null, Storage? uploadFrom = null, string time = "", Place? goFrom = null, Place? goTo = null, IItem? receive = null) 
         {
             Act = action;
             Object = obj;
@@ -50,6 +50,11 @@ namespace Task2
                         result = Wait();
                     }
                     break;
+                case Actions.Upload:
+                    {
+                        result = Upload();
+                    }
+                    break;
             }
             return result;
         }
@@ -61,7 +66,7 @@ namespace Task2
         }
         private string Upload ()
         {
-            string result = $"{Subject.Name} выложил {Object.Name} {Time}";
+            string result = $"{Subject.Name} выложил {Object.Name} из {UploadFrom.Name}";
             return result;
         }
 
