@@ -6,13 +6,12 @@ using System.Threading.Tasks;
 
 namespace Task2
 {
-    internal class Place: INameable
+    internal record class Place: INameable
     {
-        private string name;
-        public string Name { get { return name; } }
+        public string Name { get; }
         public Place(string name)
         {
-            this.name = name;
+            Name = name;
 
         }
     }

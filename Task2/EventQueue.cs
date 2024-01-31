@@ -16,22 +16,19 @@ namespace Task2
         }
         public void Add(Action action)
         {
-            Console.WriteLine("ADD");
-            Console.WriteLine(Subject.Name);
             action.Subject = Subject;
             action_queue.Enqueue(action);
         }
-        public void Start()
+        public string Start()
         {
-            Console.WriteLine("NEW EVENT");
+            string event_result = "";
             foreach(var action in action_queue)
             {
-                Console.WriteLine(action.Subject.Name);
-                Console.WriteLine(action.Object.Name);
-                Console.WriteLine(action.Act);
+                event_result += action.Do();
 
 
             }
+            return event_result;
         }
     }
 }
