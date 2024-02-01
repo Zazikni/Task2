@@ -1,33 +1,46 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Task2
-{
+﻿namespace Task2
+{    /// <summary>
+     /// Класс реализующий очередь действий. На вход опционально принимает субъект этих действий.
+     /// </summary>
     internal class EventQueue
     {
+        #region fields
         private SocietyElement _subject;
         private Queue<Action> action_queue = new Queue<Action>();
-        public SocietyElement Subject { get { return _subject; }}
-        public EventQueue(SocietyElement subject) 
+        public SocietyElement? Subject { get { return _subject; }}
+        #endregion
+        #region constructors
+        public EventQueue(SocietyElement? subject = null ) 
         {
             _subject = subject;
         }
+        #endregion
+        #region methods
+        /// <summary>
+        /// Метод для добавления действия в очередь.
+        /// </summary>
         public void Add(Action action)
         {
-            action.Subject = action.Subject == null ? Subject: action.Subject;
+            if (Subject != null)
+            {
+                action.Subject = action.Subject == null ? Subject : action.Subject;
+            }
             action_queue.Enqueue(action);
         }
-        public void SetNewEvent(SocietyElement subject)
+        /// <summary>
+        /// Метод для задания нового судьекта действий и обнуления очереди.
+        /// </summary>
+        public void SetNewEvent(SocietyElement? subject = null)
         {
             _subject = subject;
             action_queue.Clear();
         }
+        /// <summary>
+        /// Метод для запуска всех действий в очереди.
+        /// </summary>
         public string Start()
         {
-            bool isFirst =true;
+            bool isFirst = true;
             string event_result = "";
             int counter = action_queue.Count;
             foreach(var action in action_queue)
@@ -43,7 +56,7 @@ namespace Task2
                 }
                 else if(counter == 1)
                 {
-                    event_result += ", "+  action.Do() + '.';
+                    event_result += ", " +  action.Do() + '.';
                 }
                 else
                 {
@@ -57,5 +70,6 @@ namespace Task2
             }
             return event_result;
         }
+        #endregion
     }
 }

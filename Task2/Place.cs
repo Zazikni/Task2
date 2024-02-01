@@ -1,18 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Task2
+﻿namespace Task2
 {
+    /// <summary>
+    /// Класс реализующий какое-либо место в реальном мире.
+    /// </summary>
     internal record class Place: INameable
     {
+        #region fields
         public string Name { get; }
+        #endregion
+        #region constructors
         public Place(string name)
         {
             Name = name;
-
         }
+        #endregion
     }
 }

@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Task2
+﻿namespace Task2
+/// <summary>
+/// Интерфейс гарантирующий наличие свойства Owner у объекта.
+/// </summary>
 {
     internal interface IItem:INameable
     {
+        #region fields
         SocietyElement Ovner { get; set; }
+        #endregion
     }
 }

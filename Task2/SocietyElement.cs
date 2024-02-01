@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Task2
+﻿namespace Task2
 {
+    /// <summary>
+    /// Класс обозначающий абстрактное понятие элемента общества.
+    /// </summary>
     internal abstract class SocietyElement : INameable
     {
+        #region fields
         public abstract string Name { get; }
+        #endregion
     }
 }

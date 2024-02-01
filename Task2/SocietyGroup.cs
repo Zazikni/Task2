@@ -1,30 +1,113 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Task2
+﻿namespace Task2
 {
+    #region enums
+    enum SocialRole
+    {
+        Buyer,
+        Strangers,
+        Citizens,
+        NS
+    }
+    enum PronounsGroups
+    {
+        FirstPers,
+        SecondPers,
+        ThirdPers,
+        NS
+    }
+    #endregion
+    /// <summary>
+    /// Класс реализующий социальную группу.
+    /// </summary>
     internal class SocietyGroup: SocietyElement
     {
-        public override string Name { get;}
+        #region fields
+        string _name;
+        public SocialRole SocialRole { get; set; }
+        public PronounsGroups Prn { get; set; }
+        public override string Name 
+        {
+            get
+            {
+                if (SocialRole != SocialRole.NS)
+                    switch (SocialRole)
+                    {
+                        case SocialRole.Buyer:
+                            {
+                                return "Покупатели";
+                            }
+                        case SocialRole.Strangers:
+                            {
+                                return "Прохожие";
+                            }
+                        case SocialRole.Citizens:
+                            {
+                                return "Горожане";
+                            }
+                        default:
+                            {
+                                return _name;
+                            }
+                    }
+                else if(Prn != PronounsGroups.NS)
+                    switch (Prn)
+                    {
+                        case PronounsGroups.FirstPers:
+                            {
+                                return "МЫ";
+                            }
+                        case PronounsGroups.SecondPers:
+                            {
+                                return "ВЫ";
+                            }
+                        case PronounsGroups.ThirdPers:
+                            {
+                                return "Они";
+                            }
+                        default:
+                            {
+                                return _name;
+                            }
+                    }
+                else
+                {
+                    return _name;
+                }
+                
+            }
+        }
+        #endregion
+        #region constructors
         public SocietyGroup(params Person[] members ) 
         {
             foreach( Person member in members )
             {
-                if (Name == null)
+                if (_name == null)
                 { 
-                    Name = member.Name;
+                    _name = member.Name;
                 }
                 else
                 {
-                    Name += $" и {member.Name}";
+                    _name += $" и {member.Name}";
                 }
                 
             }
-            
+            SetDefault();
+        }
+        public SocietyGroup(string name)
+        {
+            _name=name;
+            SetDefault();
+
 
         }
+        #endregion
+        #region methods
+        public void SetDefault()
+        {
+            SocialRole = SocialRole.NS;
+            Prn = PronounsGroups.NS;
+        }
+        #endregion
     }
 }
