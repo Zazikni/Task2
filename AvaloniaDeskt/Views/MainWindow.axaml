@@ -1,0 +1,65 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:AvaloniaDeskt.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="AvaloniaDeskt.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="AvaloniaDeskt"
+		MinWidth="300"
+		MinHeight="300">
+	
+
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+	<Window.Styles>
+		<Style Selector="TextBox">
+			<Setter Property="Margin" Value="5"></Setter>
+			<Setter Property="CornerRadius" Value="10"></Setter>
+			<Setter Property="Background" Value="White"></Setter>
+			<Setter Property="BorderThickness" Value="0"></Setter>
+		</Style>
+		<Style Selector="TextBlock">
+			<Setter Property="Margin" Value="0"></Setter>
+			<Setter Property="HorizontalAlignment" Value="Center"></Setter>
+		</Style>
+		<Style Selector="Button">
+			<Setter Property="Margin" Value="10"></Setter>
+			<Setter Property="Padding" Value="5"></Setter>
+			<Setter Property="CornerRadius" Value="10"></Setter>
+			<Setter Property="HorizontalAlignment" Value="Center"></Setter>
+		</Style>
+
+	</Window.Styles>
+	
+	<Border Width="220" 
+			Background="WhiteSmoke" 
+			CornerRadius="10" 
+			HorizontalAlignment="Center" 
+			VerticalAlignment="Center"
+			BorderThickness="0"
+			BorderBrush="Black"
+			>
+		
+		<StackPanel   Width="200" HorizontalAlignment="Center" VerticalAlignment="Center" >
+		
+			<TextBlock Padding="10" FontSize="15">Authorization</TextBlock>
+			<TextBlock>Login</TextBlock>
+			<TextBox Name="TextBoxLogin"></TextBox>
+			<TextBlock>Password</TextBlock>
+			<TextBox Name="TextBoxPassword"></TextBox>
+			<Button Name="ButtonLogIn">LogIn</Button>
+		
+		</StackPanel>
+		
+	</Border>
+
+	
+
+
+</Window>
