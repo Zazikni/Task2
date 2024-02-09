@@ -3,6 +3,7 @@
 using Microsoft.Data.Sqlite;
 using System;
 using System.IO;
+using Serilog;
 using AvaloniaUI.Models.Users;
 
 namespace AvaloniaUI.Models.Database
@@ -71,6 +72,7 @@ namespace AvaloniaUI.Models.Database
             }
             catch (Exception ex)
             {
+                Log.Error($"Error wile adding new user to Users table name: {name} password: {password} login: {login}");
             }
 
 
