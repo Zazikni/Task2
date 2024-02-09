@@ -8,7 +8,8 @@
 
 	<Style Selector="TextBox.base">
 
-		<Setter Property="Margin" Value="5" />
+		<Setter Property="Margin" Value="5 2 5 2" />
+		<Setter Property="Padding" Value="0 0 0 0" />
 		<Setter Property="CornerRadius" Value="10" />
 		<Setter Property="Background" Value="White" />
 		<Setter Property="BorderThickness" Value="0" />
@@ -17,49 +18,45 @@
 
 	<!--________________________________________________________________________________________TextBoxTextBlock.base-->
 	<Style Selector="TextBlock.base">
-
+		<Setter Property="Margin" Value="0 0 0 0" />
+		<Setter Property="Padding" Value="0 0 0 0" />
 		<Setter Property="HorizontalAlignment" Value="Center" />
 	</Style>
 
 	<!--________________________________________________________________________________________TextBoxTextBlock.h1-->
 	<Style Selector="TextBlock.h1">
 
-		<Setter Property="Margin" Value="10" />
+		<Setter Property="Margin" Value="0 0 0 0" />
 	</Style>
 
 	<!--________________________________________________________________________________________Button.base-->
 	<Style Selector="Button.base">
 
-		<Setter Property="Margin" Value="10" />
-		<Setter Property="Padding" Value="5" />
+		<Setter Property="Margin" Value="0 0 0 0" />
+		<Setter Property="Padding" Value="0 0 0 0" />
 		<Setter Property="CornerRadius" Value="10" />
 		<Setter Property="HorizontalAlignment" Value="Center" />
 		<Setter Property="Background" Value="#9e9ee2" />
-		<!--<Setter Property="RenderTransform" Value="rotate(0)" />-->
-		<!--<Setter Property="Transitions">
-				<Transitions>
-					<TransformOperationsTransition Property="RenderTransform" Duration="0:0:10" />
-				</Transitions>
-			</Setter>-->
 
-		<!--____________________________________________________________________________Button.base:pointerover-->
+
+		<!--____________________________________________________________________________________Button.base:pointerover-->
 		<Style Selector="^:pointerover /template/ ContentPresenter">
 			<Setter Property="CornerRadius" Value="10" />
 			<Setter Property="TextBlock.Padding" Value="20 5 20 5" />
 			<Setter Property="Background" Value="#9fe2bf" />
-			<!--<Setter Property="Opacity" Value="0.1" />-->
-			<!--<Setter Property="RenderTransform" Value="rotate(180deg)" />-->
+
 		</Style>
 
-		<!--____________________________________________________________________________Button.base:pressed-->
+		<!--____________________________________________________________________________________Button.base:pressed-->
 		<Style Selector="^:pressed /template/ ContentPresenter">
-			<!--<Setter Property="TextBlock.Background" Value="Green" />-->
 		</Style>
 
 	</Style>
 	
 	<!--________________________________________________________________________________________Border.base-->
 	<Style Selector="Border.base">
+		<Setter Property="Margin" Value="0" />
+		<Setter Property="Padding" Value="0" />
 		<Setter Property="Background" Value="Lavender" />
 		<Setter Property="Width" Value="220" />
 		<Setter Property="HorizontalAlignment" Value="Center" />
@@ -69,6 +66,7 @@
 	
 	<!--________________________________________________________________________________________StackPanel.base-->
 	<Style Selector="StackPanel.base">
+		<Setter Property="Margin" Value="0" />
 		<Setter Property="Width" Value="220" />
 		<Setter Property="HorizontalAlignment" Value="Center" />
 		<Setter Property="VerticalAlignment" Value="Center" />
