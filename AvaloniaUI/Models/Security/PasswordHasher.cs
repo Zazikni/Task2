@@ -5,6 +5,16 @@ namespace AvaloniaUI.Models.Security
 {
     internal static class PasswordHasher
     {
+        #region fields
+
+        #endregion
+
+        #region constructors
+
+        #endregion
+
+        #region methods
+
         public static string CreateSHA256(string input)
         {
             using System.Security.Cryptography.SHA256 hash = System.Security.Cryptography.SHA256.Create();
@@ -14,5 +24,6 @@ namespace AvaloniaUI.Models.Security
         {
             return hash.Equals(CreateSHA256(password));
         }
+        #endregion
     }
 }

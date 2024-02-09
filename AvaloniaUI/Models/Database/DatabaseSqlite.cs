@@ -9,7 +9,7 @@ namespace AvaloniaUI.Models.Database
 {
 
 
-    internal class DatabaseSqlite
+    internal class DatabaseSqlite :IDatabase
     {
         #region fields
         private string _connectionString;
@@ -20,6 +20,7 @@ namespace AvaloniaUI.Models.Database
         public SqliteConnection Connection { get { return _connection; } }
         public string DatabsePath { get; }
         #endregion
+
         #region constructors
         public DatabaseSqlite(
             string DataSource = "project.db",
@@ -44,10 +45,10 @@ namespace AvaloniaUI.Models.Database
             if (!File.Exists(DatabsePath))
             {
                 _init_db();
-                AddUser(name: "Nikita", login: "zazik", password: "K2342^%&KNKNKJw4cw3c4wr");
-                AddUser(name: "Oleg", login: "katsd", password: "712876asKasdsassdr");
-                AddUser(name: "Billy", login: "billy212", password: "45466&%#dt56asdasd.");
-                GetUser("ZAZIK");
+                AddUser(new NewUser(name: "Nikita", login: "zazik", password: "K2342^%&KNKNKJw4cw3c4wr"));
+                AddUser(new NewUser(name: "Oleg", login: "katsd", password: "712876asKasdsassdr"));
+                AddUser(new NewUser(name: "Billy", login: "billy212", password: "45466&%#dt56asdasd."));
+                GetUser("zazik");
             }
 
 
@@ -55,6 +56,7 @@ namespace AvaloniaUI.Models.Database
 
         }
         #endregion
+
         #region methods
         private void _init_db()
         {
@@ -65,27 +67,27 @@ namespace AvaloniaUI.Models.Database
             _command.ExecuteNonQuery();
 
         }
-        public void AddUser( string name, string password, string login)
+        public void AddUser( NewUser user)
         {
             try
             {
                 SqliteCommand _command = new SqliteCommand();
                 _command.CommandText = "INSERT INTO Users (login, name, password) VALUES (@login, @name, @password)";
-                _command.Parameters.AddWithValue("@login", login);
-                _command.Parameters.AddWithValue("@name", name);
-                _command.Parameters.AddWithValue("@password", PasswordHasher.CreateSHA256(password));
+                _command.Parameters.AddWithValue("@login", user.Login);
+                _command.Parameters.AddWithValue("@name", user.Name);
+                _command.Parameters.AddWithValue("@password", PasswordHasher.CreateSHA256(user.Password));
                 _command.Connection = Connection;
                 _command.ExecuteNonQuery();
             }
             catch (SqliteException ex)
             {
-                Log.Error($"Error wile adding new user to Users table name: {name} password: {password} login: {login}\n {ex.Message}");
+                Log.Error($"Error wile adding new user to Users table name: {user.Name} password: {user.Password} login: {user.Login}\n {ex.Message}");
 
             }
             catch (Exception ex)
             {
                 
-                Log.Error($"Error wile adding new user to Users table name: {name} password: {password} login: {login}\n {ex.ToString()}");
+                Log.Error($"Error wile adding new user to Users table name: {user.Name}  password:  {user.Password} login: {user.Login}\n {ex.ToString()}");
             }
         }
         public User? GetUser(string login)
@@ -111,7 +113,7 @@ namespace AvaloniaUI.Models.Database
                 }
                 else
                 {
-                    Log.Warning($"GetUser.GetUser reader.HasRows return False");
+                    Log.Warning($"DatabaseSqlite.GetUser reader.HasRows return False");
                     
                 }
 
