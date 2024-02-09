@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using Serilog;
 using AvaloniaUI.Models.Users;
+using AvaloniaUI.Models.Security;
 
 namespace AvaloniaUI.Models.Database
 {
@@ -43,6 +44,8 @@ namespace AvaloniaUI.Models.Database
             {
                 _init_db();
                 AddUser(name: "NIKITA", login: "ZAZIK", password: "KJKNKNKJw4cw3c4wr");
+                AddUser(name: "NIKITA", login: "zazikni", password: "KJKNKNKJw4cw3c4wr");
+                AddUser(name: "NIKITA", login: "zazikniadsa", password: "KJKNKNKJw4cw3c4wr.");
             }
 
 
@@ -53,7 +56,7 @@ namespace AvaloniaUI.Models.Database
         {
 
             SqliteCommand _command = new SqliteCommand();
-            _command.CommandText = "CREATE TABLE IF NOT EXISTS Users (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, login TEXT NOT NULL UNIQUE, name TEXT NOT NULL, password TEXT NOT NULL)";
+            _command.CommandText = "CREATE TABLE IF NOT EXISTS Users (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, login TEXT NOT NULL UNIQUE, name TEXT NOT NULL, password TEXT NOT NULL CHECK(length(\"password\") == 64 ))";
             _command.Connection = Connection;
             _command.ExecuteNonQuery();
 
@@ -66,12 +69,13 @@ namespace AvaloniaUI.Models.Database
                 _command.CommandText = "INSERT INTO Users (login, name, password) VALUES (@login, @name, @password)";
                 _command.Parameters.AddWithValue("@login", login);
                 _command.Parameters.AddWithValue("@name", name);
-                _command.Parameters.AddWithValue("@password", password);
+                _command.Parameters.AddWithValue("@password", PasswordHasher.CreateSHA256(password));
                 _command.Connection = Connection;
                 _command.ExecuteNonQuery();
             }
             catch (Exception ex)
             {
+                
                 Log.Error($"Error wile adding new user to Users table name: {name} password: {password} login: {login}");
             }
 
