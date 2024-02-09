@@ -1,0 +1,91 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:AvaloniaUI.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="AvaloniaUI.Views.AuthWindow"
+        x:DataType="vm:AuthWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="AvaloniaUI">
+	<Design.DataContext>
+		<vm:AuthWindowViewModel></vm:AuthWindowViewModel>
+	</Design.DataContext>
+
+
+    <Window.Styles>
+		<Style Selector="TextBox.base">
+			<Setter Property="Margin" Value="5"/>
+			<Setter Property="CornerRadius" Value="10"/>
+			<Setter Property="Background" Value="White"/>
+			<Setter Property="BorderThickness" Value="0"/>
+			<Setter Property="HorizontalAlignment" Value="Stretch"/>
+		</Style>
+
+		<Style Selector="TextBlock.base">
+			<Setter Property="HorizontalAlignment" Value="Center"/>
+		</Style>
+		
+		<Style Selector="TextBlock.h1">
+			<Setter Property="Margin" Value="10"/>
+		</Style>
+		
+		<Style Selector="Button.base">
+			<Setter Property="Margin" Value="10"/>
+			<Setter Property="Padding" Value="5"/>
+			<Setter Property="CornerRadius" Value="10"/>
+			<Setter Property="HorizontalAlignment" Value="Center"/>
+			
+			<Style Selector="^:pointerover /template/ ContentPresenter">
+				<Setter Property="CornerRadius" Value="50"/>
+				<Setter Property="Padding" Value="5"/>
+				<Setter Property="Effect">
+					<DropShadowEffect BlurRadius="5" Color="White" OffsetX="5" OffsetY="5" />
+				</Setter>
+			</Style>
+
+			<Style Selector="^:pressed /template/ ContentPresenter">
+				<!--<Setter Property="TextBlock.Background" Value="Green"/>-->
+				<Setter Property="Effect">
+					<!---->
+				</Setter>
+			</Style>
+			
+			
+
+		</Style>
+	</Window.Styles>
+
+	<Border Padding="20">
+
+	<Border Width="220"
+			   Background="WhiteSmoke"
+			   CornerRadius="10"
+			   HorizontalAlignment="Center"
+			   VerticalAlignment="Center"
+			   BorderThickness="0"
+			   BorderBrush="Black"
+			>
+
+		<StackPanel   Width="200" HorizontalAlignment="Center" VerticalAlignment="Center" >
+
+
+			<TextBlock Text="Authorization" Classes="base h1"/>
+			<TextBlock Text="Login" Classes="base"/>
+			<TextBox Name="TextBoxLogin" Classes="base"/>
+			<TextBlock Text="Password" Classes="base"/>
+			<TextBox Name="TextBoxPassword" Classes="base" PasswordChar="*"/>
+			<Button Name="ButtonLogIn" Content="Log" Click="button_ButtonLogIn_Click"  Classes="base"/>
+			
+
+
+
+			<TextBox Name="input" IsEnabled="False"/>
+			<TextBlock IsVisible="{Binding !#input.IsEnabled}">Sorry, no can do!</TextBlock>
+
+		</StackPanel>
+
+	</Border>
+	</Border>
+
+</Window>
