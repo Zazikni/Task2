@@ -40,6 +40,7 @@ namespace AvaloniaUI.Models.Database
             _connection = new SqliteConnection(_connectionString);
             _database_path = DataSource;
             _connection.Open();
+            Log.Debug($" !File.Exists(DatabsePath)  {!File.Exists(DatabsePath)}");
             if (!File.Exists(DatabsePath))
             {
                 _init_db();
