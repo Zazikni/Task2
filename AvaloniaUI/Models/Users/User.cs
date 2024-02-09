@@ -8,10 +8,10 @@ namespace AvaloniaUI.Models.Users
 {
     internal class User : NewUser
     {
-        private int _id;
+        private Int64 _id;
 
-        int Id { get { return _id; } }
-        public User(string name, string password, string login, int id) : base(name, password, login)
+        Int64 Id { get { return _id; } }
+        public User(string name, string password, string login, Int64 id) : base(name, password, login)
         {
             _id = id;
 
