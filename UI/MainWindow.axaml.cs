@@ -1,20 +1,23 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using UI.Core;
 
-namespace AvaloniaUI.Views
+namespace UI
 {
-    public partial class AuthWindow : Window
+    public partial class MainWindow : Window
     {
-        public AuthWindow()
+        public MainWindow()
         {
-            InitializeComponent(attachDevTools: true);
+            InitializeComponent(attachDevTools:true);
         }
         public void button_ButtonLogIn_Click(object sender, RoutedEventArgs e)
         {
-            
             // Change button text when button is clicked.
             var button = (Button)sender;
-            button.Content = "Connection!";
+            button.Content = "Hello, Avaloniaasdasda!";
         }
     }
 }
+ 
+ 
+ 

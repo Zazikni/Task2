@@ -1,19 +1,19 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:vm="using:AvaloniaUI.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		
+		
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        x:Class="AvaloniaUI.Views.AuthWindow"
-        x:DataType="vm:AuthWindowViewModel"
-        Icon="/Assets/avalonia-logo.ico"
-        Title="AvaloniaUI">
-	<Design.DataContext>
-		<vm:AuthWindowViewModel></vm:AuthWindowViewModel>
-	</Design.DataContext>
+        x:Class="UI.MainWindow"
+        Title="UI"
+		Width="800"
+		Height="450"
+		MinWidth="300"
+		MinHeight="300">
 
 
-    <Window.Styles>
+	<Window.Styles>
 		<Style Selector="TextBox.base">
 			<Setter Property="Margin" Value="5"/>
 			<Setter Property="CornerRadius" Value="10"/>
@@ -74,20 +74,19 @@
 			<TextBlock Text="Login" Classes="base"/>
 			<TextBox Name="TextBoxLogin" Classes="base"/>
 			<TextBlock Text="Password" Classes="base"/>
-			<TextBox Name="TextBoxPassword" Classes="base" PasswordChar="*"/>
+			<TextBox Name="TextBoxPassword" Classes="base"/>
 			<Button Name="ButtonLogIn" Content="Log" Click="button_ButtonLogIn_Click"  Classes="base"/>
+			
 
-			<TextBlock Text="{Binding Greeting}" Classes="base"/>
 
-			<!--
-						<TextBox Name="input" IsEnabled="False"/>
+
+			<TextBox Name="input" IsEnabled="False"/>
 			<TextBlock IsVisible="{Binding !#input.IsEnabled}">Sorry, no can do!</TextBlock>
-			-->
-
 
 		</StackPanel>
 
 	</Border>
 	</Border>
+
 
 </Window>
