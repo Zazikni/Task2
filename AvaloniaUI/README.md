@@ -2,10 +2,10 @@
 Стандартная для Avalonia.
 ***
 #### Путь к файлам логов
- > [Logs](.AvaloniaUI\logs)
+ > [Logs](./logs)
  ***
 #### Путь к конфигурации
- > [Config](.AvaloniaUI\App.config)
+ > [Config](.App.config)
  ***
 #### На какой платформе вы разрабатывали, ОС, технология UI и версия .NET
  > **Платформа:**  .NET Core
