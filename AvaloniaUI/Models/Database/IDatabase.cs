@@ -12,7 +12,7 @@ namespace AvaloniaUI.Models.Database
         #endregion
 
         #region methods
-        public User? GetUser(string login) { return null; }
+        public User? GetUser(string login);
         public void AddUser(NewUser user);
         #endregion
 
