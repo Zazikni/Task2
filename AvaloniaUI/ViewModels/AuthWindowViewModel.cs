@@ -59,13 +59,12 @@ namespace AvaloniaUI.ViewModels
         }
         public async void AuthUserByLogPass()
         {
-            Login = String.Empty;
-            Password = String.Empty;
+
             Log.Debug($"Button command was clicked!");
             Log.Debug($"TextBoxLogin: {Login} TextBoxPassword:{Password}");
-            await Task.Delay(10000);
             bool access = await AuthenticationManager.AccessAllowed(login: Login, password: Password, database: database);
-
+            Login = String.Empty;
+            Password = String.Empty;
         }
         #endregion
 

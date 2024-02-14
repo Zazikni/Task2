@@ -27,7 +27,7 @@
 				<TextBox Name="TextBoxLogin" Classes="base" Watermark="Enter your login" Text="{Binding Path=Login}"/>
 				<TextBlock Text="Password" Classes="base" />
 				<TextBox Name="TextBoxPassword" Classes="base" PasswordChar="*" Watermark="Enter your password" Text="{Binding Path=Password}"/>
-				<Button Name="ButtonLogIn" Content="Log" Click="button_ButtonLogIn_Click" Command="{Binding DoSomeThing}" Classes="base" />
+				<Button Name="ButtonLogIn" Content="Log" Click="button_ButtonLogIn_Click" Command="{Binding AuthUser}" Classes="base" />
 
 				<!--
 						<TextBox Name="input" IsEnabled="False" />
