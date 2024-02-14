@@ -6,11 +6,12 @@ using AvaloniaUI.Models.Security;
 using Microsoft.Data.Sqlite;
 using Serilog;
 using Tmds.DBus.Protocol;
+using System.Threading;
 
 
 namespace AvaloniaUI.Models.Database
 {
-    internal class DatabasePostgreSql //: IDatabase
+    internal class DatabasePostgreSql : IDatabase
     {
         #region fields
         string _connectionString;
@@ -29,7 +30,7 @@ namespace AvaloniaUI.Models.Database
             var dataSourceBuilder = new NpgsqlDataSourceBuilder(_connectionString);
             _dataSource = dataSourceBuilder.Build();
 
-            _init();
+            //_init();
 
 
         }
@@ -43,6 +44,11 @@ namespace AvaloniaUI.Models.Database
             await x;
             await y;
             await z;
+
+            var w = GetUser("zazik");
+            await w;
+
+
         }
         public async Task AddUser(NewUser user)
         {
@@ -56,28 +62,74 @@ namespace AvaloniaUI.Models.Database
                 _command.Parameters.AddWithValue("@name", user.Name);
                 _command.Parameters.AddWithValue("@password", PasswordHasher.CreateSHA256(user.Password));
                 await _command.ExecuteNonQueryAsync();
+                Log.Debug($"Add new user to database login: {user.Login} \t name: {user.Name}");
 
 
             }
             catch (NpgsqlException ex)
             {
-                Log.Error($"Error wile adding new user to Users table name: {user.Name} password: {user.Password} login: {user.Login}\n {ex.Message}");
+                Log.Error($"Error when adding a new user to Users table name: {user.Name} password: {user.Password} login: {user.Login}\n {ex.Message}");
 
             }
             catch (Exception ex)
             {
 
-                Log.Error($"Error wile adding new user to Users table name: {user.Name}  password:  {user.Password} login: {user.Login}\n {ex.ToString()}");
+                Log.Error($"Error when adding a new user to Users table name: {user.Name}  password:  {user.Password} login: {user.Login}\n {ex.ToString()}");
             }
             finally
             {
-                connection.Close();
+                await connection.DisposeAsync();
             }
         }
 
-        public User? GetUser(string login)
+        public async Task<User?> GetUser(string login)
         {
-            throw new NotImplementedException();
+            
+            var connection = await _dataSource.OpenConnectionAsync();
+            try
+            {
+                NpgsqlCommand _command = new NpgsqlCommand();
+                _command.CommandText = "SELECT login, name, password, id FROM Users WHERE login=@login";
+                _command.Parameters.AddWithValue("@login", login);
+                _command.Connection = connection;
+                var reader = await _command.ExecuteReaderAsync();
+
+                if (reader.HasRows)
+                {
+                    reader.Read();
+                    string db_login = (string)reader.GetValue(0);
+                    string db_name = (string)reader.GetValue(1);
+                    string db_password = (string)reader.GetValue(2);
+                    Int64 db_id = Convert.ToInt64(reader.GetValue(3));
+
+                    Log.Debug($"{db_login} \t {db_name} \t {db_password} \t {db_id}");
+                    return new User(name: db_name, login: db_login, password: db_password, id: db_id);
+
+                }
+                else
+                {
+                    Log.Warning($"DatabasePostgreSql.GetUser reader.HasRows return False");
+
+                }
+
+
+            }
+            catch (NpgsqlException ex)
+            {
+                Log.Error($"Error wile selecting User from table login: {login}\n{ex.ToString()}");
+
+            }
+            catch (Exception ex)
+            {
+
+                Log.Error($"Error wile selecting User from table login: {login}\n{ex.ToString()}");
+            }
+            finally
+            {
+                await connection.DisposeAsync();
+            }
+            return null;
+
         }
         #endregion
 

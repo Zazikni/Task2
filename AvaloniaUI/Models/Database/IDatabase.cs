@@ -1,4 +1,5 @@
 ﻿using AvaloniaUI.Models.Users;
+using System.Threading.Tasks;
 
 namespace AvaloniaUI.Models.Database
 {
@@ -12,8 +13,8 @@ namespace AvaloniaUI.Models.Database
         #endregion
 
         #region methods
-        public User? GetUser(string login);
-        public void AddUser(NewUser user);
+        public  Task<User?> GetUser(string login);
+        public Task AddUser(NewUser user);
         #endregion
 
     }

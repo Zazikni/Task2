@@ -4,6 +4,7 @@ using System.IO;
 using Serilog;
 using AvaloniaUI.Models.Users;
 using AvaloniaUI.Models.Security;
+using System.Threading.Tasks;
 
 namespace AvaloniaUI.Models.Database
 {
@@ -45,10 +46,7 @@ namespace AvaloniaUI.Models.Database
             if (!File.Exists(DatabsePath))
             {
                 _init_db();
-                AddUser(new NewUser(name: "Nikita", login: "zazik", password: "K2342^%&KNKNKJw4cw3c4wr"));
-                AddUser(new NewUser(name: "Oleg", login: "katsd", password: "712876asKasdsassdr"));
-                AddUser(new NewUser(name: "Billy", login: "billy212", password: "45466&%#dt56asdasd."));
-                GetUser("zazik");
+
             }
 
 
@@ -58,16 +56,20 @@ namespace AvaloniaUI.Models.Database
         #endregion
 
         #region methods
-        private void _init_db()
+        private async Task _init_db()
         {
 
             SqliteCommand _command = new SqliteCommand();
             _command.CommandText = "CREATE TABLE IF NOT EXISTS Users (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, login TEXT NOT NULL UNIQUE, name TEXT NOT NULL, password TEXT NOT NULL CHECK(length(\"password\") == 64 ))";
             _command.Connection = Connection;
             _command.ExecuteNonQuery();
+            await AddUser(new NewUser(name: "Nikita", login: "zazik", password: "K2342^%&KNKNKJw4cw3c4wr"));
+            await AddUser(new NewUser(name: "Oleg", login: "katsd", password: "712876asKasdsassdr"));
+            await AddUser(new NewUser(name: "Billy", login: "billy212", password: "45466&%#dt56asdasd."));
+            await GetUser("zazik");
 
         }
-        public void AddUser( NewUser user)
+        public async Task AddUser( NewUser user)
         {
             try
             {
@@ -77,7 +79,7 @@ namespace AvaloniaUI.Models.Database
                 _command.Parameters.AddWithValue("@name", user.Name);
                 _command.Parameters.AddWithValue("@password", PasswordHasher.CreateSHA256(user.Password));
                 _command.Connection = Connection;
-                _command.ExecuteNonQuery();
+                await _command.ExecuteReaderAsync();
             }
             catch (SqliteException ex)
             {
@@ -90,7 +92,7 @@ namespace AvaloniaUI.Models.Database
                 Log.Error($"Error wile adding new user to Users table name: {user.Name}  password:  {user.Password} login: {user.Login}\n {ex.ToString()}");
             }
         }
-        public User? GetUser(string login)
+        public async Task<User?> GetUser(string login)
         {
             try
             {
@@ -98,7 +100,7 @@ namespace AvaloniaUI.Models.Database
                 _command.CommandText = "SELECT login, name, password, id FROM Users WHERE login=@login";
                 _command.Parameters.AddWithValue("@login", login);
                 _command.Connection = Connection;
-                SqliteDataReader reader = _command.ExecuteReader();
+                SqliteDataReader reader = await _command.ExecuteReaderAsync();
                 if (reader.HasRows)
                 {
                     reader.Read();
