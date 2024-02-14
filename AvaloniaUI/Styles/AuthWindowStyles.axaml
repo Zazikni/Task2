@@ -7,18 +7,19 @@
 	</Design.PreviewWith>
 
 	<Style Selector="TextBox.base">
-
+		<Style Selector="^ /template/ Border#PART_BorderElement">
+			<Setter Property="BorderBrush" Value="White"/>
+		</Style>
 		<Setter Property="Margin" Value="5 2 5 2" />
-		<Setter Property="Padding" Value="0 0 0 0" />
+		<Setter Property="Padding" Value="5 5 5 5" />
 		<Setter Property="CornerRadius" Value="10" />
 		<Setter Property="Background" Value="White" />
-		<Setter Property="BorderThickness" Value="0" />
 		<Setter Property="HorizontalAlignment" Value="Stretch" />
 	</Style>
 
 	<!--________________________________________________________________________________________TextBoxTextBlock.base-->
 	<Style Selector="TextBlock.base">
-		<Setter Property="Margin" Value="0 0 0 0" />
+		<Setter Property="Margin" Value="5 2 5 2" />
 		<Setter Property="Padding" Value="0 0 0 0" />
 		<Setter Property="HorizontalAlignment" Value="Center" />
 	</Style>
