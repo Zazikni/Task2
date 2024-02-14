@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Serilog;
 
 namespace AvaloniaUI.Views
 {
@@ -13,8 +14,12 @@ namespace AvaloniaUI.Views
         {
             
             // Change button text when button is clicked.
-            var button = (Button)sender;
-            button.Content = "Connection!";
+            //var button = (Button)sender;
+            //Getting Controls references
+            //var textBoxLogin = this.FindControl<TextBox>("TextBoxLogin");
+            //var textBoxPass = this.FindControl<TextBox>("TextBoxPassword");
+            //Log.Debug($"Button {button.Name} was clicked!");
+            //Log.Debug($"TextBoxLogin: {textBoxLogin.Text} TextBoxPassword:{textBoxPass.Text}");
         }
     }
 }
