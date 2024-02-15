@@ -7,6 +7,7 @@ using Microsoft.Data.Sqlite;
 using Serilog;
 using Tmds.DBus.Protocol;
 using System.Threading;
+using System.Configuration;
 
 
 namespace AvaloniaUI.Models.Database
@@ -16,26 +17,41 @@ namespace AvaloniaUI.Models.Database
         #region fields
         string _connectionString;
         NpgsqlDataSource _dataSource;
+        private static DatabasePostgreSql? _instance = null;
+        public static DatabasePostgreSql Instance
+        {
+            get
+            {
+                // Инициализация экземпляра, если он ещё не был создан
+                if (_instance == null)
+                {
+                    _instance = new DatabasePostgreSql();
+                }
+                return _instance;
+            }
+        }
         #endregion
         #region constructors
-        public DatabasePostgreSql(string host, string database, string username, string password, int port)
+        private DatabasePostgreSql()
+            
+            
         {
+
             NpgsqlConnectionStringBuilder _csb = new NpgsqlConnectionStringBuilder();
-            _csb.Host = host;
-            _csb.Database = database;
-            _csb.Username = username;
-            _csb.Password = password;
-            _csb.Port = port;
+            _csb.Host = ConfigurationManager.AppSettings["PostgreHost"];
+            _csb.Database = ConfigurationManager.AppSettings["PostgreDatabase"];
+            _csb.Username = ConfigurationManager.AppSettings["PostgreUsername"];
+            _csb.Password = ConfigurationManager.AppSettings["PostgrePassword"];
+            _csb.Port = Convert.ToInt32(ConfigurationManager.AppSettings["PostgrePort"]);
             _connectionString = _csb.ToString();
             var dataSourceBuilder = new NpgsqlDataSourceBuilder(_connectionString);
             _dataSource = dataSourceBuilder.Build();
-
-            //_init();
 
 
         }
         #endregion
         #region methods
+
         private async Task _init()
         {
             var x =  AddUser(new NewUser(name: "Nikita", login: "zazik", password: "K2342^%&KNKNKJw4cw3c4wr"));
