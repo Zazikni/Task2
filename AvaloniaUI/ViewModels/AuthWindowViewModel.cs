@@ -1,33 +1,24 @@
 ﻿using AvaloniaUI.Models.Database;
-using Microsoft.Data.Sqlite;
 using System.Configuration;
 using System;
 using ReactiveUI;
-using System.Windows.Input;
-using Avalonia.Controls;
 using Serilog;
 using AvaloniaUI.Models.Security;
-using System.Threading.Tasks;
-using Avalonia;
 using System.Reactive;
-using System.Diagnostics;
+using AvaloniaUI.Models.WindowManager;
 namespace AvaloniaUI.ViewModels
 {
     public class AuthWindowViewModel : ViewModelBase
     {
 
-        DatabasePostgreSql database = new DatabasePostgreSql(
-            host: ConfigurationManager.AppSettings["PostgreHost"],  
-            database: ConfigurationManager.AppSettings["PostgreDatabase"],  
-            username: ConfigurationManager.AppSettings["PostgreUsername"],
-            password: ConfigurationManager.AppSettings["PostgrePassword"],
-            port: Convert.ToInt32(ConfigurationManager.AppSettings["PostgrePort"]));
+        DatabasePostgreSql database = DatabasePostgreSql.Instance;
 
-#pragma warning disable CA1822 // Mark members as static
         #region fields
-
         private string _login = string.Empty;
         private string _password = string.Empty;
+        
+
+
         public string Login {
             get { return _login; }
             set { this.RaiseAndSetIfChanged(ref _login, value); }
@@ -40,34 +31,41 @@ namespace AvaloniaUI.ViewModels
 
         #endregion
         #region commands
-        public ReactiveCommand<Unit, Unit> AuthUser { get; }
-        public ReactiveCommand<Unit, Unit> DoSomeThing { get; }
+        public ReactiveCommand<Unit, Unit> AuthUserCommand { get; }
+        public ReactiveCommand<Unit, Unit> OpenRegisterWindowCommand { get; }
         #endregion
-
+        #region constructors
         public AuthWindowViewModel()
         {
-            DoSomeThing = ReactiveCommand.Create(RunSomeThing);
-            AuthUser = ReactiveCommand.Create(AuthUserByLogPass);
+            OpenRegisterWindowCommand = ReactiveCommand.Create(OpenRegisterWindow);
+            AuthUserCommand = ReactiveCommand.Create(AuthUserByLogPass);
         }
+        #endregion
         #region commMethods
-        public async void RunSomeThing()
+
+        public async void OpenRegisterWindow()
         {
-            Log.Debug("RunSomeThing START");
-            await Task.Delay(10000);
-            Log.Debug("RunSomeThing END");
+
+            Log.Debug($"Button with OpenRegisterWindowCommand was clicked!");
+            WindowManager.ShowRegWindow();
 
         }
+
         public async void AuthUserByLogPass()
         {
 
-            Log.Debug($"Button command was clicked!");
-            Log.Debug($"TextBoxLogin: {Login} TextBoxPassword:{Password}");
+            Log.Debug($"Button from AuthWindow with AuthUserCommand was clicked!");
+            Log.Debug($"TextBoxLogin: {Login}\tTextBoxPassword:{Password}");
             bool access = await AuthenticationManager.AccessAllowed(login: Login, password: Password, database: database);
             Login = String.Empty;
             Password = String.Empty;
+            if( access )
+            {
+                WindowManager.SwitchToMainWindow();
+            }
         }
         #endregion
 
-#pragma warning restore CA1822 // Mark members as static
     }
-    }
+}
+ 
