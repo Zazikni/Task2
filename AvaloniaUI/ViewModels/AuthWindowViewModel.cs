@@ -11,12 +11,10 @@ namespace AvaloniaUI.ViewModels
     public class AuthWindowViewModel : ViewModelBase
     {
 
-        DatabasePostgreSql database = DatabasePostgreSql.Instance;
-
         #region fields
         private string _login = string.Empty;
         private string _password = string.Empty;
-        
+        IDatabase database = DatabasePostgreSql.Instance;
 
 
         public string Login {
@@ -30,10 +28,12 @@ namespace AvaloniaUI.ViewModels
         }
 
         #endregion
+
         #region commands
         public ReactiveCommand<Unit, Unit> AuthUserCommand { get; }
         public ReactiveCommand<Unit, Unit> OpenRegisterWindowCommand { get; }
         #endregion
+
         #region constructors
         public AuthWindowViewModel()
         {
@@ -41,6 +41,7 @@ namespace AvaloniaUI.ViewModels
             AuthUserCommand = ReactiveCommand.Create(AuthUserByLogPass);
         }
         #endregion
+
         #region commMethods
 
         public async void OpenRegisterWindow()
@@ -61,7 +62,9 @@ namespace AvaloniaUI.ViewModels
             Password = String.Empty;
             if( access )
             {
+                WindowManager.CloseRegWindow();
                 WindowManager.SwitchToMainWindow();
+                
             }
         }
         #endregion
