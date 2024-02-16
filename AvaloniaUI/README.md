@@ -2,7 +2,7 @@
 Стандартная для Avalonia.
 ***
 #### Путь к файлам логов
- > [Logs](./logs)
+ > [Logging](./Models\Logging\LoggerInit.cs)
  ***
 #### Путь к конфигурации
  > [Config](App.config)
