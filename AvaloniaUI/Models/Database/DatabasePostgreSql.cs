@@ -12,6 +12,11 @@ using System.Configuration;
 
 namespace AvaloniaUI.Models.Database
 {
+    /// <summary>
+    /// Класс реализует взаимодействие с базой данных.
+    /// Не имеет конструктора.
+    /// Получить объект можно через свойство DatabasePostgreSql.Instance.
+    /// </summary>
     internal class DatabasePostgreSql : IDatabase
     {
         #region fields
@@ -22,7 +27,6 @@ namespace AvaloniaUI.Models.Database
         {
             get
             {
-                // Инициализация экземпляра, если он ещё не был создан
                 if (_instance == null)
                 {
                     _instance = new DatabasePostgreSql();
@@ -31,6 +35,7 @@ namespace AvaloniaUI.Models.Database
             }
         }
         #endregion
+
         #region constructors
         private DatabasePostgreSql()
             
@@ -50,6 +55,7 @@ namespace AvaloniaUI.Models.Database
 
         }
         #endregion
+
         #region methods
 
         private async Task _init()
@@ -66,6 +72,9 @@ namespace AvaloniaUI.Models.Database
 
 
         }
+        /// <summary>
+        /// Метод для добавления нового пользователя в базу данных.
+        /// </summary>
         public async Task AddUser(NewUser user)
         {
             var connection = await _dataSource.OpenConnectionAsync();
@@ -97,6 +106,9 @@ namespace AvaloniaUI.Models.Database
                 await connection.DisposeAsync();
             }
         }
+        /// <summary>
+        /// Метод для извлечения данных о пользователе из базы данных.
+        /// </summary>
 
         public async Task<User?> GetUser(string login)
         {
@@ -151,3 +163,4 @@ namespace AvaloniaUI.Models.Database
 
     }
 }
+

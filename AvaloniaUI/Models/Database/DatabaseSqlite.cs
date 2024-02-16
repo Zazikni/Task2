@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 namespace AvaloniaUI.Models.Database
 {
 
-
     internal class DatabaseSqlite :IDatabase
     {
         #region fields

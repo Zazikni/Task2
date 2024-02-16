@@ -5,9 +5,16 @@ using System.Threading.Tasks;
 
 namespace AvaloniaUI.Models.Security
 {
+    /// <summary>
+    /// Класс для аутентификации пользователей.
+    /// </summary>
     internal static class AuthenticationManager
     {
-       
+        #region methods
+        /// <summary>
+        /// Проверяет имеет ли пользователь доступ.
+        /// </summary>
+
         public static async Task<bool> AccessAllowed(string login, string password, IDatabase database)
         {
             User? user =  await database.GetUser(login:login);
@@ -30,8 +37,7 @@ namespace AvaloniaUI.Models.Security
                     return false;
                 }
             }
-
-
         }
+        #endregion
     }
 }

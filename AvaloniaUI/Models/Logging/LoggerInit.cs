@@ -5,7 +5,9 @@ using System;
 
 
 namespace AvaloniaUI.Models.Logging
-{
+{/// <summary>
+/// Инициализирует базовый Logger из библиотеки Serilog.
+/// </summary>
     internal class LoggerInit
     {
         public LoggerInit()

@@ -19,7 +19,5 @@ namespace AvaloniaUI.Models.Users
 
         #endregion
 
-
-
     }
 }
