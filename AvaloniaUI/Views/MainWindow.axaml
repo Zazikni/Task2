@@ -6,9 +6,11 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:DataType="vm:MainWindowViewModel"
         x:Class="AvaloniaUI.MainWindow"
-        Title="MainWindow">
+        Title="MainWindow"
+		WindowStartupLocation="CenterScreen"
+		>
 	<Design.DataContext>
 		<vm:MainWindowViewModel></vm:MainWindowViewModel>
 	</Design.DataContext>
-	<TextBox Text="{Binding Message}"></TextBox>
+	<TextBlock Text="{Binding Message}"></TextBlock>
 </Window>

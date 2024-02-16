@@ -8,6 +8,7 @@
         x:DataType="vm:AuthWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
         Title="AvaloniaUI"
+		WindowStartupLocation="CenterScreen"
 		>
 	<Design.DataContext>
 		<vm:AuthWindowViewModel></vm:AuthWindowViewModel>
