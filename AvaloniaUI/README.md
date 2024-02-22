@@ -18,4 +18,17 @@
 
 ***
 #### Дополнительную информацию при наличии дополнительных усложнений и нестандартных решений
+База данных: PostgreSql
+***
+Таблица:
+
+```
+CREATE TABLE IF NOT EXISTS Users(
+	id SERIAL PRIMARY KEY,
+	name CHARACTER VARYING(128),
+	password CHARACTER VARYING(64),
+	login CHARACTER VARYING(64) UNIQUE
+);
+```
+
 ***
