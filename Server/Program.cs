@@ -176,9 +176,8 @@ namespace Server
                         {
                             message = await Reader.ReadLineAsync();
                             if (message == null) continue;
-                            message = $"{login}: {message}";
-                            Console.WriteLine(message);
-                            await server.BroadcastMessageAsync(message, Id);
+                            Console.WriteLine($"Получены данные от клиента {Client.Client.RemoteEndPoint}. Данные: {message}");
+
                         }
                         catch
                         {
