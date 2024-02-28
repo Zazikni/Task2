@@ -6,6 +6,7 @@ namespace Server.Models.Client
 {
     class ClientObject
     {
+        #region fields
         private bool _isAuthorized;
         public bool IsAuthorized
         {
@@ -29,7 +30,9 @@ namespace Server.Models.Client
         TcpClient _client;
         public TcpClient Client { get { return _client; } }
         ServerObject server; // объект сервера
+        #endregion
 
+        #region constructors
         public ClientObject(TcpClient tcpClient, ServerObject serverObject)
         {
 
@@ -42,49 +45,15 @@ namespace Server.Models.Client
             // создаем StreamWriter для отправки данных
             Writer = new StreamWriter(stream);
         }
+        #endregion
 
+        #region methods
         public async Task ProcessAsync()
         {
             try
             {
                 string login = String.Empty;
                 string password = String.Empty;
-                while (!IsAuthorized)
-                {
-                    // получаем логин и пароль пользователя
-                    string? connString = await Reader.ReadLineAsync();
-                    string[] userData = connString.Split('@');
-                    try
-                    {
-                        Console.WriteLine($"Получены данные от клиента {Client.Client.RemoteEndPoint}. Данные: {connString}");
-                        _isAuthorized = await AuthenticationManager.AccessAllowed(login: userData[0], password: userData[1], database: server.Database);
-                    }
-
-                    catch (IndexOutOfRangeException)
-                    {
-
-                        await server.SinglecastMessageAsync("Ожидаются данные в формате login@password", Id);
-
-
-                    }
-
-                    if (IsAuthorized)
-                    {
-                        login = userData[0];
-                        password = userData[1];
-                        await server.SinglecastMessageAsync($"acess allowed", Id);
-
-                    }
-                    else
-                    {
-                        await server.SinglecastMessageAsync("Неверные данные.", Id);
-                        Console.WriteLine($"Введенные данные от клиента {Client.Client.RemoteEndPoint} - не подошли.");
-                    }
-
-
-                }
-
-                Console.WriteLine($"Клиент {Client.Client.RemoteEndPoint} - авторизовался под логином:{login}.");
                 string? message = null;
 
                 // в бесконечном цикле получаем сообщения от клиента
@@ -95,11 +64,55 @@ namespace Server.Models.Client
                         message = await Reader.ReadLineAsync();
                         if (message == null) continue;
                         Console.WriteLine($"Получены данные от клиента {Client.Client.RemoteEndPoint}. Данные: {message}");
-                        if (message == "spam")
+                        if (message == "-spam")
                         {
+                            if (!IsAuthorized)
+                            {
+                                await server.SinglecastMessageAsync("access denied", Id);
+                                continue;
+                            }
 
                             _spamAllowed = !_spamAllowed;
                             Console.WriteLine($"Клиент {Client.Client.RemoteEndPoint}. Рассылка = {SpamAllowed}");
+
+                        }
+                        else if(message.StartsWith("-auth "))
+                        {
+                            Console.WriteLine($"Клиента {Client.Client.RemoteEndPoint} - запросил аутентификацию.");
+                            Console.WriteLine($"{message}");
+                            message = message.Trim().Substring(6);
+                            Console.WriteLine($"{message}");
+
+                            string[] userData = message.Trim().Split('@');
+                            Console.WriteLine($"{userData[0]}");
+                            Console.WriteLine($"{userData[1]}");
+
+                            try
+                            {
+                                _isAuthorized = await AuthenticationManager.AccessAllowed(login: userData[0], password: userData[1], database: server.Database);
+                                Console.WriteLine($"{IsAuthorized}");
+
+                            }
+
+                            catch (IndexOutOfRangeException)
+                            {
+
+                                await server.SinglecastMessageAsync("Ожидаются данные в формате login@password", Id);
+
+
+                            }
+                            if (IsAuthorized)
+                            {
+                                login = userData[0];
+                                password = userData[1];
+                                await server.SinglecastMessageAsync($"access allowed", Id);
+
+                            }
+                            else
+                            {
+                                await server.SinglecastMessageAsync("access denied", Id);
+                                Console.WriteLine($"Клиент {Client.Client.RemoteEndPoint} - не прошел аутентификацию.");
+                            }
 
                         }
 
@@ -129,5 +142,6 @@ namespace Server.Models.Client
             Reader.Close();
             _client.Close();
         }
+        #endregion
     }
 }
