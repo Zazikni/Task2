@@ -33,7 +33,7 @@ namespace AvaloniaClient.ViewModels
         private async Task GetDataAsync()
         {
             Log.Debug($"GetDataAsync start");
-            await _server.SendMessageAsync("spam");
+            await _server.SendMessageAsync("-spam");
             while ( true )
             {
                 try

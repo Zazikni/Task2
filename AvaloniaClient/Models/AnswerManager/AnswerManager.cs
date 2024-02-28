@@ -15,7 +15,7 @@ namespace AvaloniaClient.Models.AnswerManager
         /// <returns></returns>
         public async static Task<bool> Access(string response)
         {
-            if(response == "acess allowed")
+            if(response == "access allowed")
             {
                 return true;
             }

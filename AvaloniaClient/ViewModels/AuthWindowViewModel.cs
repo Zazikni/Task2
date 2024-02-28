@@ -78,7 +78,7 @@ namespace AvaloniaClient.ViewModels
             bool access = false;//await AuthenticationManager.AccessAllowed(login: Login, password: Password, database: database);
             try
             {
-                await _server.SendMessageAsync($"{Login}@{Password}");
+                await _server.SendMessageAsync($"-auth {Login}@{Password}");
             }
             catch (SocketException ex)
 
