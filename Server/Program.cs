@@ -15,8 +15,10 @@ namespace Server
         {
             new LoggerInit();
             ServerObject server = new ServerObject();// создаем сервер
+            Task.Run(server.SpamProcessAsync); // Запускаем рассылку
             await server.ListenAsync(); // запускаем сервер
         }
+
 
 
         class ServerObject
@@ -25,6 +27,31 @@ namespace Server
             public IDatabase Database { get { return _database; } }
             TcpListener tcpListener = new TcpListener(IPAddress.Any, 8888); // сервер для прослушивания
             List<ClientObject> clients = new List<ClientObject>(); // все подключения
+
+            public async void SpamProcessAsync()
+            {
+                Console.WriteLine("Рассылка - запущена.");
+
+                string message = "Какая-то история о Незнайке.";
+                while(true)
+                {
+                    if (clients.Count != 0)
+                    {
+                        Console.WriteLine("Рассылка.");
+
+                        await BroadcastMessageAsync(message);
+                        Console.WriteLine("Рассылка завершена.");
+
+                        await Task.Delay(10000);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Сообщения не отправлены -  подключений нет.");
+                        await Task.Delay(10000);
+
+                    }
+                }
+            }
 
             // прослушивание входящих подключений
             protected internal async Task ListenAsync()
@@ -63,14 +90,25 @@ namespace Server
             }
 
             // трансляция сообщения подключенным клиентам
-            protected internal async Task BroadcastMessageAsync(string message, string id)
+            protected internal async Task BroadcastMessageAsync(string message, string? id = null)
             {
                 foreach (var client in clients)
                 {
                     if (client.Id != id) // если id клиента не равно id отправителя
-                    {
-                        await client.Writer.WriteLineAsync(message); //передача данных
-                        await client.Writer.FlushAsync();
+                    { 
+                        if (client.SpamAllowed) // разрешена массовая отправка
+                        {
+
+                            await client.Writer.WriteLineAsync(message); //передача данных
+                            await client.Writer.FlushAsync();
+                            Console.WriteLine($"Клиент {client.Client.Client.RemoteEndPoint}. Отправлено сообщение {message}");
+
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Клиент {client.Client.Client.RemoteEndPoint}. Рассылка запрещена.");
+                        }
+
                     }
                 }
             }
@@ -104,6 +142,14 @@ namespace Server
                 get
                 {
                     return _isAuthorized;
+                }
+            }
+            private bool _spamAllowed = false;
+            public bool SpamAllowed
+            {
+                get
+                {
+                    return _spamAllowed;
                 }
             }
             protected internal string Id { get; } = Guid.NewGuid().ToString();
@@ -156,6 +202,8 @@ namespace Server
                         {
                             login = userData[0];
                             password = userData[1];
+                            await server.SinglecastMessageAsync($"acess allowed", Id);
+
                         }
                         else
                         {
@@ -177,6 +225,13 @@ namespace Server
                             message = await Reader.ReadLineAsync();
                             if (message == null) continue;
                             Console.WriteLine($"Получены данные от клиента {Client.Client.RemoteEndPoint}. Данные: {message}");
+                            if (message == "spam")
+                            {
+
+                                _spamAllowed = !_spamAllowed;
+                                Console.WriteLine($"Клиент {Client.Client.RemoteEndPoint}. Рассылка = {SpamAllowed}");
+
+                            }
 
                         }
                         catch
