@@ -10,10 +10,10 @@ namespace ConsoleClient
             string host = "127.0.0.1";
             int port = 8888;
             using TcpClient client = new TcpClient();
-            Console.Write("Введите свой логин и пароль в формате логин@пароль: ");
-            string? userData = Console.ReadLine();
             StreamReader? Reader = null;
             StreamWriter? Writer = null;
+            Console.WriteLine("Для отправки команды введите ее и нажмите Enter");
+
 
             try
             {
@@ -21,6 +21,7 @@ namespace ConsoleClient
                 Reader = new StreamReader(client.GetStream());
                 Writer = new StreamWriter(client.GetStream());
                 if (Writer is null || Reader is null) return;
+
                 // запускаем новый поток для получения данных
                 Task.Run(() => ReceiveMessageAsync(Reader));
                 // запускаем ввод сообщений
@@ -36,10 +37,10 @@ namespace ConsoleClient
             // отправка сообщений
             async Task SendMessageAsync(StreamWriter writer)
             {
-                // сначала отправляем имя
+                string? userData = Console.ReadLine();
+
                 await writer.WriteLineAsync(userData);
                 await writer.FlushAsync();
-                Console.WriteLine("Для отправки сообщений введите сообщение и нажмите Enter");
 
                 while (true)
                 {
@@ -59,7 +60,8 @@ namespace ConsoleClient
                         string? message = await reader.ReadLineAsync();
                         // если пустой ответ, ничего не выводим на консоль
                         if (string.IsNullOrEmpty(message)) continue;
-                        Print(message);//вывод сообщения
+
+                        Print("-->    " + message);//вывод сообщения
                     }
 
                     catch
