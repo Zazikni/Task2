@@ -9,14 +9,17 @@ namespace Server
         {
             new LoggerInit();
             ServerObject server = new ServerObject();// создаем сервер
+            Task server_task = server.ListenAsync(); // запускаем сервер
             Task.Run(server.SpamProcessAsync); // Запускаем рассылку
-            await server.ListenAsync(); // запускаем сервер
+            await server_task;
+
+
         }
 
 
 
-        
-        
+
+
 
 
 
