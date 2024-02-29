@@ -3,6 +3,8 @@ using ReactiveUI;
 using Serilog;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using AvaloniaClient.Models.WindowManager;
+
 
 namespace AvaloniaClient.ViewModels
 {
@@ -24,15 +26,15 @@ namespace AvaloniaClient.ViewModels
         {
             Log.Debug($"MainWindowViewModel init");
 
-            GetDataAsync();
+            GetDataFromServerAsync();
 
         }
         #endregion
 
         #region tasks
-        private async Task GetDataAsync()
+        private async Task GetDataFromServerAsync()
         {
-            Log.Debug($"GetDataAsync start");
+            Log.Information($"GetDataFromServerAsync start");
             await _server.SendMessageAsync("-spam");
             while ( true )
             {
@@ -40,24 +42,24 @@ namespace AvaloniaClient.ViewModels
                 {
                     string result = await Task.Run(async () =>
                     {
-                        Log.Debug($"Calculation start");
                         string tmp = await _server.ReceiveMessageAsync();
-                        Log.Debug($"Calculation end");
                         return tmp;
                     });
 
-                    Message = result;
-                    await Task.Delay(10000);
+                    Message += "\n" + result;
+                    
 
                 }
                 catch( SocketException ex)
                 {
                     Log.Error($"GetDataAsync {ex.Message}");
-
+                    WindowManager.SwitchToAuthWindow();
+                    break;
                 }
 
 
             }
+            Log.Information($"GetDataFromServerAsync end");
 
 
 

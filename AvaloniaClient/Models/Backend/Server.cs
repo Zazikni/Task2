@@ -58,7 +58,7 @@ namespace AvaloniaClient.Models.Backend
                 Connect();
                 if (Client.Connected)
                 {
-                    Log.Debug($"Server {Host}:{Port} connection - OK!");
+                    Log.Information($"Server {Host}:{Port} Attempt:{i} connection - OK!");
 
                     callback();
 
@@ -84,8 +84,7 @@ namespace AvaloniaClient.Models.Backend
             }
             catch (SocketException ex)
             {
-                Log.Debug($"Connection error {Host}:{Port} {ex.Message}");
-                Log.Error(ex.Message);
+                Log.Error($"Connection error {Host}:{Port} {ex.Message}");
 
             }
         }
@@ -95,7 +94,7 @@ namespace AvaloniaClient.Models.Backend
         /// <exception cref="SocketException"></exception>
         public async Task SendMessageAsync(string message)
         {
-            Log.Debug($"Sending message {message} to server {Host}:{Port}");
+            Log.Information($"Sending message {message} to server {Host}:{Port}");
 
             try
             {
@@ -104,14 +103,14 @@ namespace AvaloniaClient.Models.Backend
             }
             catch (IOException ex)
             {
-                Log.Debug($"Connection error {Host}:{Port} {ex.Message}");
+                Log.Error($"Connection error {Host}:{Port} {ex.Message}");
 
                 throw new SocketException();
 
             }
             catch (SocketException ex)
             {
-                Log.Debug($"Connection error. {ex.Message}");
+                Log.Error($"Connection error {Host}:{Port} {ex.Message}");
                 throw new SocketException();
             }
 
@@ -124,7 +123,7 @@ namespace AvaloniaClient.Models.Backend
         /// <exception cref="SocketException"></exception>
         public async Task<string> ReceiveMessageAsync()
         {
-            Log.Debug($"Receiving message from server {Host}:{Port}");
+            Log.Information($"Receiving message from server {Host}:{Port}");
             try
             {
 
@@ -137,14 +136,14 @@ namespace AvaloniaClient.Models.Backend
             }
             catch (IOException ex)
             {
-                Log.Debug($"Connection error {Host}:{Port} {ex.Message}");
+                Log.Error($"Connection error {Host}:{Port} {ex.Message}");
 
                 throw new SocketException();
 
             }
             catch (SocketException ex)
             {
-                Log.Debug($"Connection error. {ex.Message}");
+                Log.Error($"Connection error. {ex.Message}");
                 throw new SocketException();
             }
 

@@ -1,14 +1,13 @@
-﻿using System.Configuration;
-using System;
+﻿using AvaloniaClient.Models.AnswerManager;
+using AvaloniaClient.Models.Backend;
+using AvaloniaClient.Models.WindowManager;
 using ReactiveUI;
 using Serilog;
-using System.Reactive;
-using AvaloniaClient.Models.WindowManager;
-using AvaloniaClient.Models.Backend;
+using System;
 using System.Net.Sockets;
-using AvaloniaClient.Models.AnswerManager;
+using System.Reactive;
 using System.Threading.Tasks;
-using Tmds.DBus.Protocol;
+using System.Xml.Linq;
 namespace AvaloniaClient.ViewModels
 {
     public class AuthWindowViewModel : ViewModelBase
@@ -66,7 +65,7 @@ namespace AvaloniaClient.ViewModels
             RefreshConnectionStatus();
 
             Log.Debug($"Button with OpenRegisterWindowCommand was clicked!");
-            //WindowManager.ShowRegWindow();
+            WindowManager.ShowRegWindow();
 
         }
 
@@ -75,9 +74,20 @@ namespace AvaloniaClient.ViewModels
         {
             Log.Debug($"Button from AuthWindow with AuthUserCommand was clicked!");
             Log.Debug($"TextBoxLogin: {Login}\tTextBoxPassword:{Password}");
-            bool access = false;//await AuthenticationManager.AccessAllowed(login: Login, password: Password, database: database);
+            ServerResponse access ;
+            if (String.IsNullOrEmpty(Login) || String.IsNullOrEmpty(Password))
+            {
+                Log.Information($"Incorrect data.");
+                return;
+            }
+            if (String.IsNullOrWhiteSpace(Login) || String.IsNullOrWhiteSpace(Password))
+            {
+                Log.Information($"Incorrect data.");
+                return;
+            }
             try
             {
+                
                 await _server.SendMessageAsync($"-auth {Login}@{Password}");
             }
             catch (SocketException ex)
@@ -90,8 +100,8 @@ namespace AvaloniaClient.ViewModels
             }
             try
             {
-                access = await AnswerManager.Access( await _server.ReceiveMessageAsync()); // получает ответ от сервера и преобразовывает его
-                Log.Debug($"Access =  {access}");
+                access = await AnswerManager.AccessResponse( await _server.ReceiveMessageAsync()); // получает ответ от сервера и преобразовывает его
+                Log.Debug($"Response.StatusCode =  {access.StatusCode} Response.Message =  {access.Message}");
             }
             catch (SocketException ex)
             {
@@ -104,15 +114,16 @@ namespace AvaloniaClient.ViewModels
 
             Login = String.Empty;
             Password = String.Empty;
-            if( access )
+            if( access.StatusCode == StatusCodes.OK )
             {
-                //WindowManager.CloseRegWindow();
+                WindowManager.CloseRegWindow();
                 WindowManager.SwitchToMainWindow();
                 
             }
         }
 
         #endregion
+
         #region methods
         public async void RefreshConnectionStatus()
         {
