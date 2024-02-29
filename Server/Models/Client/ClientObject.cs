@@ -105,14 +105,23 @@ namespace Server.Models.Client
                             {
                                 login = userData[0];
                                 password = userData[1];
-                                await server.SinglecastMessageAsync($"access allowed", Id);
+                                await server.SinglecastMessageAsync($"200@access allowed", Id);
 
                             }
                             else
                             {
-                                await server.SinglecastMessageAsync("access denied", Id);
+                                await server.SinglecastMessageAsync("403@access denied", Id);
                                 Console.WriteLine($"Клиент {Client.Client.RemoteEndPoint} - не прошел аутентификацию.");
                             }
+
+                        }
+                        else if (message.StartsWith("-reg "))
+                        {
+
+                        }
+                        else
+                        {
+                            await server.SinglecastMessageAsync("404@no such command", Id);
 
                         }
 

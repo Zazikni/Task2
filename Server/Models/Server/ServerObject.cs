@@ -3,6 +3,7 @@ using System.Net.Sockets;
 using System.Net;
 using System.Xml.Linq;
 using Server.Models.Client;
+using System.Configuration;
 
 namespace Server.Models.Server
 {
@@ -16,6 +17,7 @@ namespace Server.Models.Server
         public async void SpamProcessAsync()
         {
             Console.WriteLine("Рассылка - запущена.");
+            int timeout = Convert.ToInt32(ConfigurationManager.AppSettings["SpamTimeout"]);
 
             string message = "Какая-то история о Незнайке.";
             while (true)
@@ -27,12 +29,12 @@ namespace Server.Models.Server
                     await BroadcastMessageAsync(message);
                     Console.WriteLine("Рассылка завершена.");
 
-                    await Task.Delay(10000);
+                    await Task.Delay(timeout);
                 }
                 else
                 {
                     Console.WriteLine("Сообщения не отправлены -  подключений нет.");
-                    await Task.Delay(10000);
+                    await Task.Delay(timeout);
 
                 }
             }

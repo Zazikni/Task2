@@ -1,5 +1,6 @@
 ﻿using Models.Logging;
 using Server.Models.Server;
+using System.Configuration;
 
 namespace Server
 {
