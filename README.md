@@ -10,3 +10,13 @@
 #### 3 task
  > [README](./AvaloniaUI/README.md)
  ***
+#### 4 task
+ > [CONSOLE CLIENT](./ConsoleClient/README.md)
+
+ > [UI CLIENT](./AvaloniaClient/README.md)
+
+ > [SERVER](./Server/README.md)
+
+
+
+ ***
