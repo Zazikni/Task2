@@ -1,10 +1,12 @@
-﻿using System.Net.Sockets;
+﻿using Backend;
+using System.Net.Sockets;
 using System.Text;
 
 namespace ConsoleClient
 {
     internal class Program
     {
+        /*
         static async Task Main(string[] args)
         {
             string host = "127.0.0.1";
@@ -92,6 +94,15 @@ namespace ConsoleClient
             }
 
 
+        }*/
+        static async Task Main(string[] args)
+        {
+            new LoggerInit();
+            ConnectionService.Instance.Start();
+            while (true)
+            {
+                ConnectionService.Instance.Add(Console.ReadLine());
+            }
         }
     }
 }

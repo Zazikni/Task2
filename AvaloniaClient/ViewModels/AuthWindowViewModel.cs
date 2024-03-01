@@ -1,6 +1,7 @@
 ﻿using AvaloniaClient.Models.AnswerManager;
 using AvaloniaClient.Models.Backend;
 using AvaloniaClient.Models.WindowManager;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using ReactiveUI;
 using Serilog;
 using System;
@@ -14,7 +15,7 @@ namespace AvaloniaClient.ViewModels
     {
 
         #region fields
-        private Server _server = Server.Instance;
+        //private Server _server = Server.Instance;
         private bool _connection;
         public bool Connection
         {
@@ -49,14 +50,11 @@ namespace AvaloniaClient.ViewModels
         #region constructors
         public AuthWindowViewModel()
         {
-            _connection = _server.Client.Connected;
+            _connection = ConnectionService.Instance.Client.Connected;
+            ConnectionService.Instance.AddCallback(RefreshConnectionStatus);
             OpenRegisterWindowCommand = ReactiveCommand.Create(OpenRegisterWindow);
             AuthUserCommand = ReactiveCommand.Create(AuthUserByLogPass);
-            if (!Connection)
-            {
-                Task.Run(() => _server.Reconnect(RefreshConnectionStatus));
 
-            }
         }
         #endregion
 
@@ -64,7 +62,6 @@ namespace AvaloniaClient.ViewModels
 
         public async void OpenRegisterWindow()
         {
-
             Log.Debug($"Button with OpenRegisterWindowCommand was clicked!");
             WindowManager.ShowRegWindow();
 
@@ -89,19 +86,20 @@ namespace AvaloniaClient.ViewModels
             try
             {
                 
-                await _server.SendMessageAsync($"-auth {Login}@{Password}");
+                //await _server.SendMessageAsync($"-auth {Login}@{Password}");
             }
             catch (SocketException ex)
 
             {
-                Task.Run(() => _server.Reconnect(RefreshConnectionStatus)); // если не удалось отправить - будет переподключаться к серверу.
+                //Task.Run(() => _server.Reconnect(RefreshConnectionStatus)); // если не удалось отправить - будет переподключаться к серверу.
                 RefreshConnectionStatus(); // обновляет состояние окна пользовательского интерфейса
                 Log.Debug($"Failure to send data to the server {ex.Message}");
                 return;
             }
             try
             {
-                access = await AnswerManager.AccessResponse( await _server.ReceiveMessageAsync()); // получает ответ от сервера и преобразовывает его
+                access = new ServerResponse("404@asdasdasd");
+                //access = await AnswerManager.AccessResponse( await _server.ReceiveMessageAsync()); // получает ответ от сервера и преобразовывает его
                 Log.Debug($"Response.StatusCode =  {access.StatusCode} Response.Message =  {access.Message}");
             }
             catch (SocketException ex)
@@ -117,6 +115,7 @@ namespace AvaloniaClient.ViewModels
             Password = String.Empty;
             if( access.StatusCode == StatusCodes.OK )
             {
+                ConnectionService.Instance.RemoveCallback(RefreshConnectionStatus);
                 WindowManager.CloseRegWindow();
                 WindowManager.SwitchToMainWindow();
                 
@@ -128,8 +127,8 @@ namespace AvaloniaClient.ViewModels
         #region methods
         public async void RefreshConnectionStatus()
         {
-            Log.Debug($"RefreshConnectionStatus _server.Connected - {_server.Client.Connected}");
-            Connection = _server.Client.Connected;
+            Log.Debug($"RefreshConnectionStatus ConnectionService.Instance.Client.Connected - {ConnectionService.Instance.Client.Connected}");
+            Connection = ConnectionService.Instance.Client.Connected;
 
         }
         #endregion

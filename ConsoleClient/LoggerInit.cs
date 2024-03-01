@@ -4,7 +4,7 @@ using System.Configuration;
 using System;
 
 
-namespace AvaloniaClient.Models.Logging
+namespace Backend
 {/// <summary>
 /// Инициализирует базовый Logger из библиотеки Serilog.
 /// </summary>
@@ -20,7 +20,6 @@ namespace AvaloniaClient.Models.Logging
                         .WriteTo.File(path: "logs/warn-.log", restrictedToMinimumLevel: LogEventLevel.Warning, rollingInterval: RollingInterval.Day, rollOnFileSizeLimit: true, fileSizeLimitBytes: logFileSize)
                         .WriteTo.File(path: "logs/error-.log", restrictedToMinimumLevel: LogEventLevel.Error, rollingInterval: RollingInterval.Day, rollOnFileSizeLimit: true, fileSizeLimitBytes: logFileSize)
                         .CreateLogger();
-            Log.Debug("Логер инициализирован.");
         }
     }
 }
