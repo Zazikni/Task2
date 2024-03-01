@@ -4,6 +4,8 @@ using Serilog;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using AvaloniaClient.Models.WindowManager;
+using System;
+using AvaloniaClient.Models.AnswerManager;
 
 
 namespace AvaloniaClient.ViewModels
@@ -12,7 +14,6 @@ namespace AvaloniaClient.ViewModels
     {
         #region fields
         private string _message = "Wait a bit...";
-        private Server _server = Server.Instance;
 
         public string Message
         {
@@ -35,16 +36,21 @@ namespace AvaloniaClient.ViewModels
         private async Task GetDataFromServerAsync()
         {
             Log.Information($"GetDataFromServerAsync start");
-            await _server.SendMessageAsync("-spam");
+
+            ServerRequest request = new ServerRequest(command:"-spam");
+            ConnectionService.Instance.AddRequest(request);
+            ServerResponse comm_response = await ConnectionService.Instance.GetResponseAsync(response_id: request.Id, timeout: TimeSpan.FromSeconds(2));
+
             while ( true )
             {
                 try
                 {
                     string result = await Task.Run(async () =>
                     {
-                        string tmp = await _server.ReceiveMessageAsync();
-                        return tmp;
-                    });
+                        ServerResponse response = await ConnectionService.Instance.GetResponseAsync(response_id: 0000, timeout: TimeSpan.FromSeconds(20000));
+                        return response.Message;
+                    }
+                    );
 
                     Message += "\n" + result;
                     

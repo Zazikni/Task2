@@ -19,7 +19,7 @@ namespace Server.Models.Server
             Console.WriteLine("Рассылка - запущена.");
             int timeout = Convert.ToInt32(ConfigurationManager.AppSettings["SpamTimeout"]);
 
-            string message = "Какая-то история о Незнайке.";
+            string message = "0000@000@Какая-то история о Незнайке.";
             while (true)
             {
                 if (clients.Count != 0)

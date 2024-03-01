@@ -89,11 +89,11 @@ namespace AvaloniaClient.ViewModels
                 Log.Information($"Incorrect data.");
                 return;
             }
-            request = new ServerRequest($"-reg {Name}@{Login}@{Password}");
+            request = new ServerRequest(command: "-reg", message: $"{Name}@{Login}@{Password}");
             ConnectionService.Instance.AddRequest(request);
             try
             {
-                response = await ConnectionService.Instance.GetResponseAsync(response_id: request.Id, timeout: TimeSpan.FromSeconds(10));
+                response = await ConnectionService.Instance.GetResponseAsync(response_id: request.Id, timeout: TimeSpan.FromSeconds(2));
             }
             catch (TimeoutException ex)
             {

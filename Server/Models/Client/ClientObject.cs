@@ -67,63 +67,86 @@ namespace Server.Models.Client
                         message = await Reader.ReadLineAsync();
                         if (message == null) continue;
                         Console.WriteLine($"Получены данные от клиента {Client.Client.RemoteEndPoint}. Данные: {message}");
-                        if (message == "-spam")
+                        if (message.Contains("-spam"))
                         {
+
+
+                            Console.WriteLine($"Клиент {Client.Client.RemoteEndPoint} - запросил {(_spamAllowed?"отключение":"подключение")} рассылки.");
+                            int request_id = Convert.ToInt32(message.Remove(9));
+                            try
+                            {
+                                string[] userData = message.Trim().Split('@');
+
+                            }
+                            catch(IndexOutOfRangeException)
+                            {
+                                await server.SinglecastMessageAsync($"{request_id}@400@Неправильный формат входных данных.", Id);
+                            }
+                            catch
+                            {
+
+                            }
+
                             if (!IsAuthorized)
                             {
-                                await server.SinglecastMessageAsync($"400@access denied@999999999", Id);
+                                await server.SinglecastMessageAsync($"{request_id}@400@Доступ запрещен.", Id);
                                 continue;
+                            }
+                            else
+                            {
+                                await server.SinglecastMessageAsync($"{request_id}@200@ОК", Id);
                             }
 
                             _spamAllowed = !_spamAllowed;
-                            Console.WriteLine($"Клиент {Client.Client.RemoteEndPoint}. Рассылка = {SpamAllowed}");
 
                         }
-                        else if(message.StartsWith("-auth "))
+                        else if(message.Contains("-auth"))
                         {
                             Console.WriteLine($"Клиент {Client.Client.RemoteEndPoint} - запросил аутентификацию.");
-                            message = message.Trim().Substring(6);
+                            int request_id = Convert.ToInt32(message.Remove(9));
+
                             string[] userData = message.Trim().Split('@');
 
 
                             try
                             {
-                                _isAuthorized = await AuthenticationManager.AccessAllowed(login: userData[0], password: userData[1], database: server.Database);
+
+                                _isAuthorized = await AuthenticationManager.AccessAllowed(login: userData[2], password: userData[3], database: server.Database);
                             }
 
                             catch (IndexOutOfRangeException)
                             {
-                                await server.SinglecastMessageAsync($"400@неверный формат данных@{userData[2]}", Id);
+                                await server.SinglecastMessageAsync($"{request_id}@400@Неправильный формат входных данных.", Id);
 
                             }
                             if (IsAuthorized)
                             {
-                                login = userData[0];
-                                password = userData[1];
-                                await server.SinglecastMessageAsync($"200@access allowed@{userData[2]}", Id);
+                                login = userData[2];
+                                password = userData[3];
+                                await server.SinglecastMessageAsync($"{request_id}@200@Доступ разрешен.", Id);
 
                             }
                             else
                             {
-                                await server.SinglecastMessageAsync($"403@access denied@{userData[2]}", Id);
+                                await server.SinglecastMessageAsync($"{request_id}@403@Доступ запрещен.", Id);
                                 Console.WriteLine($"Клиент {Client.Client.RemoteEndPoint} - не прошел аутентификацию.");
                             }
 
                         }
-                        else if (message.StartsWith("-reg "))
+                        else if (message.Contains("-reg"))
                         {
                             Console.WriteLine($"Клиент {Client.Client.RemoteEndPoint} - запросил регистрацию.");
-                            message = message.Trim().Substring(5);
+                            int request_id = Convert.ToInt32(message.Remove(9));
                             string[] userData = message.Trim().Split('@');
 
 
                             try
                             {
-                                string new_user_name = userData[0];
-                                string new_user_login = userData[1];
-                                string new_user_password = userData[2];
+                                string new_user_name = userData[2];
+                                string new_user_login = userData[3];
+                                string new_user_password = userData[4];
                                 await DatabasePostgreSql.Instance.AddUser(new NewUser(name:new_user_name, login:new_user_login, password:new_user_password));
-                                await  server.SinglecastMessageAsync($"201@created@{userData[3]}", Id);
+                                await  server.SinglecastMessageAsync($"{request_id}@201@Пользователь успешно зарегистрирован.", Id);
                                 Console.WriteLine($"Клиент {Client.Client.RemoteEndPoint} - успешно зарегистрирован.");
 
 
@@ -133,7 +156,7 @@ namespace Server.Models.Client
                             catch (IndexOutOfRangeException)
                             {
 
-                                await server.SinglecastMessageAsync("400@Ожидаются данные в формате name@login@password", Id);
+                                await server.SinglecastMessageAsync("400", Id);
                                 continue;
 
                             }
@@ -141,19 +164,19 @@ namespace Server.Models.Client
                             {
                                 if (ex.Message.Contains("\"users_login_key\""))
                                 {
-                                    await server.SinglecastMessageAsync($"400@user alredy exists@{userData[2]}", Id);
+                                    await server.SinglecastMessageAsync($"{request_id}@400@Пользователь уже зарегистрирован.", Id);
 
                                 }
                                 else
                                 {
-                                    await server.SinglecastMessageAsync($"400@data error@{userData[2]}", Id);
+                                    await server.SinglecastMessageAsync($"{request_id}@400@Неправильный формат входных данных.", Id);
 
                                 }
 
                             }
                             catch (Exception ex)
                             {
-                                await server.SinglecastMessageAsync($"400@data error@{userData[2]}", Id);
+                                await server.SinglecastMessageAsync($"{request_id}@400@Неправильный формат входных данных.", Id);
 
                                 Console.WriteLine(ex.ToString());
                             }
@@ -162,7 +185,7 @@ namespace Server.Models.Client
                         }
                         else
                         {
-                            await server.SinglecastMessageAsync($"404@no such command@", Id);
+                            //await server.SinglecastMessageAsync($"0@404@Неправильный формат входных данных.", Id);
 
                         }
 

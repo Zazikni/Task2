@@ -37,9 +37,9 @@ namespace AvaloniaClient.Models.AnswerManager
                 string[] response_data = response.Split('@');
                 try
                 {
-                    int status_code = Convert.ToInt32(response_data[0]);
-                    string message = response_data[1];
-                    int id = Convert.ToInt32(response_data[2]);
+                    int id = Convert.ToInt32(response_data[0]);
+                    int status_code = Convert.ToInt32(response_data[1]);
+                    string message = response_data[2];
                     return new ServerResponse(status_code: status_code, message: message, id: id);
 
                 }
