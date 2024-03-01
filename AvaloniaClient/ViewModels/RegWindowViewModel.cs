@@ -15,8 +15,6 @@ namespace AvaloniaClient.ViewModels
     {
 
         #region fields
-        private Server _server = Server.Instance;
-
         private string _name;
         private string _login;
         private string _password;
@@ -64,7 +62,9 @@ namespace AvaloniaClient.ViewModels
         #region constructors
         public RegWindowViewModel()
         {
-            RefreshConnectionStatus();
+            _connection = ConnectionService.Instance.Client.Connected;
+
+            ConnectionService.Instance.AddCallback(RefreshConnectionStatus);
             RegUserCommand = ReactiveCommand.Create(RegUser);
         }
         #endregion
@@ -77,6 +77,8 @@ namespace AvaloniaClient.ViewModels
             Log.Debug($"TextBoxLogin: {Name}\tTextBoxLogin: {Login}\tTextBoxPassword:{Password}");
 
             ServerResponse response;
+            ServerRequest request;
+
             if (String.IsNullOrEmpty(Name) || String.IsNullOrEmpty(Login) || String.IsNullOrEmpty(Password))
             {
                 Log.Information($"Incorrect data.");
@@ -87,36 +89,24 @@ namespace AvaloniaClient.ViewModels
                 Log.Information($"Incorrect data.");
                 return;
             }
+            request = new ServerRequest($"-reg {Name}@{Login}@{Password}");
+            ConnectionService.Instance.AddRequest(request);
             try
             {
-
-                await _server.SendMessageAsync($"-reg {Name}@{Login}@{Password}");
+                response = await ConnectionService.Instance.GetResponseAsync(response_id: request.Id, timeout: TimeSpan.FromSeconds(10));
             }
-            catch (SocketException ex)
-
+            catch (TimeoutException ex)
             {
-                Task.Run(() => _server.Reconnect(RefreshConnectionStatus)); // если не удалось отправить - будет переподключаться к серверу.
-                RefreshConnectionStatus(); // обновляет состояние окна пользовательского интерфейса
-                Log.Debug($"Failure to send data to the server {ex.Message}");
+                Log.Information($"Запрос {request.Id} TimeoutException");
                 return;
             }
-            try
-            {
-                response = await AnswerManager.RegResponse(await _server.ReceiveMessageAsync()); // получает ответ от сервера и преобразовывает его
-                //Log.Debug($"Access =  {access}");
-            }
-            catch (SocketException ex)
-            {
 
-                RefreshConnectionStatus(); // обновляет состояние окна пользовательского интерфейса
-
-                Log.Debug($"Failure to receive data from the server {ex.Message}");
-                return;
-            }
 
 
             if (response.StatusCode == StatusCodes.CREATED)
             {
+                ConnectionService.Instance.RemoveCallback(RefreshConnectionStatus);
+                //TODO при удалении окна программно возможно программа упадет так как в делегате отснется ссылка на этот метод
                 WindowManager.CloseRegWindow();
 
             }
@@ -130,8 +120,8 @@ namespace AvaloniaClient.ViewModels
         #region methods
         public async void RefreshConnectionStatus()
         {
-            Log.Debug($"RefreshConnectionStatus _server.Connected - {_server.Client.Connected}");
-            Connection = _server.Client.Connected;
+            Log.Debug($"RefreshConnectionStatus ConnectionService.Instance.Client.Connected - {ConnectionService.Instance.Client.Connected}");
+            Connection = ConnectionService.Instance.Client.Connected;
 
         }
         #endregion

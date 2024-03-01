@@ -72,7 +72,8 @@ namespace AvaloniaClient.ViewModels
         {
             Log.Debug($"Button from AuthWindow with AuthUserCommand was clicked!");
             Log.Debug($"TextBoxLogin: {Login}\tTextBoxPassword:{Password}");
-            ServerResponse access ;
+            ServerResponse response ;
+            ServerRequest request;
             if (String.IsNullOrEmpty(Login) || String.IsNullOrEmpty(Password))
             {
                 Log.Information($"Incorrect data.");
@@ -83,37 +84,21 @@ namespace AvaloniaClient.ViewModels
                 Log.Information($"Incorrect data.");
                 return;
             }
+            request = new ServerRequest($"-auth {Login}@{Password}");
+            ConnectionService.Instance.AddRequest(request);
             try
             {
-                
-                //await _server.SendMessageAsync($"-auth {Login}@{Password}");
+                response = await ConnectionService.Instance.GetResponseAsync(response_id:request.Id, timeout: TimeSpan.FromSeconds(10));
             }
-            catch (SocketException ex)
-
+            catch(TimeoutException ex)
             {
-                //Task.Run(() => _server.Reconnect(RefreshConnectionStatus)); // если не удалось отправить - будет переподключаться к серверу.
-                RefreshConnectionStatus(); // обновляет состояние окна пользовательского интерфейса
-                Log.Debug($"Failure to send data to the server {ex.Message}");
-                return;
-            }
-            try
-            {
-                access = new ServerResponse("404@asdasdasd");
-                //access = await AnswerManager.AccessResponse( await _server.ReceiveMessageAsync()); // получает ответ от сервера и преобразовывает его
-                Log.Debug($"Response.StatusCode =  {access.StatusCode} Response.Message =  {access.Message}");
-            }
-            catch (SocketException ex)
-            {
-
-                RefreshConnectionStatus(); // обновляет состояние окна пользовательского интерфейса
-
-                Log.Debug($"Failure to receive data from the server {ex.Message}");
+                Log.Information($"Запрос {request.Id} TimeoutException");
                 return;
             }
 
             Login = String.Empty;
             Password = String.Empty;
-            if( access.StatusCode == StatusCodes.OK )
+            if( response.StatusCode == StatusCodes.OK )
             {
                 ConnectionService.Instance.RemoveCallback(RefreshConnectionStatus);
                 WindowManager.CloseRegWindow();

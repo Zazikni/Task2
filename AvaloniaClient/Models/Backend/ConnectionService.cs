@@ -3,6 +3,7 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
@@ -31,16 +32,17 @@ namespace AvaloniaClient.Models.Backend
         private string _host = ConfigurationManager.AppSettings["ServerHost"];
         public string Host { get { return _host; } }
         private int _port = Convert.ToInt32(ConfigurationManager.AppSettings["ServerPort"]);
-        private int _monitoring_cd = Convert.ToInt32(ConfigurationManager.AppSettings["ServerPort"]);
         private int _sendDelayIfNoConnection = Convert.ToInt32(ConfigurationManager.AppSettings["SendingDelayIfNoConnection"]);
         private int _reciveDelayIfNoConnection = Convert.ToInt32(ConfigurationManager.AppSettings["ReadingDelayIfNoConnection"]);
         private int _monitoringDelay = Convert.ToInt32(ConfigurationManager.AppSettings["MonitoringDelay"]);
+        //private int _answerTimeout = Convert.ToInt32(ConfigurationManager.AppSettings["MonitoringDelay"]);
+        private int _responseIterationDelay = Convert.ToInt32(ConfigurationManager.AppSettings["ResponseIterationDelay"]);
         public int Port { get { return _port; } }
         private TcpClient _tcpClient;
         public TcpClient Client { get { return _tcpClient; } }
         private StreamReader? Reader = null;
         private StreamWriter? Writer = null;
-        private List<string> requests = new List<string>();
+        private List<ServerRequest> requests = new List<ServerRequest>();
         private List<ServerResponse> responses = new List<ServerResponse>();
         private Thread monitoringThread;
         private bool monitoringIsRunning = true;
@@ -176,10 +178,19 @@ namespace AvaloniaClient.Models.Backend
                         string? message = await Reader.ReadLineAsync();
                         Log.Debug($"C cервера {Host}:{Port} пришло нвовое сообщение");
 
-                        // если пустой ответ, ничего не выводим на консоль
+                        // если пустой ответ, пропускаем
                         if (string.IsNullOrEmpty(message)) continue;
-                        Console.WriteLine($"{message}\n");
-                        // TODO наполнение списка ответов
+                        try
+                        {
+                            ServerResponse response =  await AnswerManager.AnswerManager.GetResponse(message);
+                            responses.Add(response);
+                        }
+                        catch 
+                        {
+                            continue;
+                        }
+
+
 
                     }
 
@@ -201,17 +212,17 @@ namespace AvaloniaClient.Models.Backend
         {
             Log.Information($"Запущен процесс отправки сообщений на сервер {Host}:{Port}");
 
-            string message;
+            ServerRequest request;
 
             while (true)
             {
                 if (Client.Connected && requests.Count > 0)
                 {
-                    message = requests[0];
-                    Log.Information($"Отправка сообщения {message}");
+                    request = requests[0];
+                    Log.Information($"Отправка сообщения {request.ToString()}");
                     try
                     {
-                        await Writer.WriteLineAsync(message);
+                        await Writer.WriteLineAsync(request.ToString());
                         await Writer.FlushAsync();
                     }
                     catch (Exception ex)
@@ -220,7 +231,7 @@ namespace AvaloniaClient.Models.Backend
                         continue;
                     }
 
-                    requests.Remove(message);
+                    requests.Remove(request);
 
 
                 }
@@ -233,11 +244,38 @@ namespace AvaloniaClient.Models.Backend
         }
         private void SimpleCallbackWhenConnectionResumed()
         {
-            Log.Debug("SimpleCallbackWhenResumed");
+            Log.Debug("Статус соеденения изменился - обработка события делегатом.");
         }
-        public void Add(string message)
+        public void AddRequest(ServerRequest request)
         {
-            requests.Add(message);
+            requests.Add(request);
+        }
+        public async Task<ServerResponse> GetResponseAsync(int response_id, TimeSpan timeout)
+        {
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            // TODO стоило бы как-то оптимизировать этот метод
+            while (true)
+            {
+                foreach (ServerResponse response in responses)
+                {
+                    if (response.Id == response_id)
+                    {
+                        responses.Remove(response);
+                        return response;
+                    }
+
+                }
+                if (stopwatch.Elapsed > timeout)
+                {
+                    stopwatch.Stop();
+                    throw new TimeoutException($"Ожидание ответа привысило {timeout.TotalSeconds} секунд.");
+
+                }
+                await Task.Delay(_responseIterationDelay);
+
+            }
+
+
         }
         #endregion
 

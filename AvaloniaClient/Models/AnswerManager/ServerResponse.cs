@@ -19,21 +19,23 @@ namespace AvaloniaClient.Models.AnswerManager
        NOT_FOUND  = 404
 
     }
-    internal class ServerResponse
+    internal class ServerResponse:IServerMessage
     {
         #region fields
         private StatusCodes _status;
         public StatusCodes StatusCode { get { return _status; }}
         private string _message;
         public string Message { get { return _message; }}
+        private int _id;
+        public int Id { get { return _id; }}
         #endregion
 
         #region constructors
-        public ServerResponse(string response)
+        public ServerResponse(int status_code, string message, int id)
         {
-            string[] response_data = response.Split('@');
-            _status = (StatusCodes)Convert.ToInt32(response_data[0]);
-            _message = response_data[1];
+            _status = (StatusCodes)status_code;
+            _message = message;
+            _id = id;
 
         }
         #endregion

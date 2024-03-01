@@ -71,7 +71,7 @@ namespace Server.Models.Client
                         {
                             if (!IsAuthorized)
                             {
-                                await server.SinglecastMessageAsync("access denied", Id);
+                                await server.SinglecastMessageAsync($"400@access denied@999999999", Id);
                                 continue;
                             }
 
@@ -93,19 +93,19 @@ namespace Server.Models.Client
 
                             catch (IndexOutOfRangeException)
                             {
-                                await server.SinglecastMessageAsync("400@Ожидаются данные в формате login@password", Id);
+                                await server.SinglecastMessageAsync($"400@неверный формат данных@{userData[2]}", Id);
 
                             }
                             if (IsAuthorized)
                             {
                                 login = userData[0];
                                 password = userData[1];
-                                await server.SinglecastMessageAsync($"200@access allowed", Id);
+                                await server.SinglecastMessageAsync($"200@access allowed@{userData[2]}", Id);
 
                             }
                             else
                             {
-                                await server.SinglecastMessageAsync("403@access denied", Id);
+                                await server.SinglecastMessageAsync($"403@access denied@{userData[2]}", Id);
                                 Console.WriteLine($"Клиент {Client.Client.RemoteEndPoint} - не прошел аутентификацию.");
                             }
 
@@ -123,7 +123,7 @@ namespace Server.Models.Client
                                 string new_user_login = userData[1];
                                 string new_user_password = userData[2];
                                 await DatabasePostgreSql.Instance.AddUser(new NewUser(name:new_user_name, login:new_user_login, password:new_user_password));
-                                await  server.SinglecastMessageAsync("201@created", Id);
+                                await  server.SinglecastMessageAsync($"201@created@{userData[3]}", Id);
                                 Console.WriteLine($"Клиент {Client.Client.RemoteEndPoint} - успешно зарегистрирован.");
 
 
@@ -141,19 +141,19 @@ namespace Server.Models.Client
                             {
                                 if (ex.Message.Contains("\"users_login_key\""))
                                 {
-                                    await server.SinglecastMessageAsync($"400@user alredy exists", Id);
+                                    await server.SinglecastMessageAsync($"400@user alredy exists@{userData[2]}", Id);
 
                                 }
                                 else
                                 {
-                                    await server.SinglecastMessageAsync($"400@data error", Id);
+                                    await server.SinglecastMessageAsync($"400@data error@{userData[2]}", Id);
 
                                 }
 
                             }
                             catch (Exception ex)
                             {
-                                await server.SinglecastMessageAsync($"400@data error", Id);
+                                await server.SinglecastMessageAsync($"400@data error@{userData[2]}", Id);
 
                                 Console.WriteLine(ex.ToString());
                             }
@@ -162,7 +162,7 @@ namespace Server.Models.Client
                         }
                         else
                         {
-                            await server.SinglecastMessageAsync("404@no such command", Id);
+                            await server.SinglecastMessageAsync($"404@no such command@", Id);
 
                         }
 
