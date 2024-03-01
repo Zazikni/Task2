@@ -64,6 +64,7 @@ namespace AvaloniaClient.ViewModels
         #region constructors
         public RegWindowViewModel()
         {
+            RefreshConnectionStatus();
             RegUserCommand = ReactiveCommand.Create(RegUser);
         }
         #endregion
@@ -109,7 +110,7 @@ namespace AvaloniaClient.ViewModels
 
                 RefreshConnectionStatus(); // обновляет состояние окна пользовательского интерфейса
 
-                Log.Debug($"Failure to send data to the server {ex.Message}");
+                Log.Debug($"Failure to receive data from the server {ex.Message}");
                 return;
             }
 

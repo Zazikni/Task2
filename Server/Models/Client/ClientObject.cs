@@ -1,6 +1,9 @@
-﻿using Models.Security;
+﻿using Models.Database;
+using Models.Security;
 using Server.Models.Server;
 using System.Net.Sockets;
+using Models.Users;
+using Npgsql;
 
 namespace Server.Models.Client
 {
@@ -78,27 +81,19 @@ namespace Server.Models.Client
                         }
                         else if(message.StartsWith("-auth "))
                         {
-                            Console.WriteLine($"Клиента {Client.Client.RemoteEndPoint} - запросил аутентификацию.");
-                            Console.WriteLine($"{message}");
+                            Console.WriteLine($"Клиент {Client.Client.RemoteEndPoint} - запросил аутентификацию.");
                             message = message.Trim().Substring(6);
-                            Console.WriteLine($"{message}");
-
                             string[] userData = message.Trim().Split('@');
-                            Console.WriteLine($"{userData[0]}");
-                            Console.WriteLine($"{userData[1]}");
+
 
                             try
                             {
                                 _isAuthorized = await AuthenticationManager.AccessAllowed(login: userData[0], password: userData[1], database: server.Database);
-                                Console.WriteLine($"{IsAuthorized}");
-
                             }
 
                             catch (IndexOutOfRangeException)
                             {
-
-                                await server.SinglecastMessageAsync("Ожидаются данные в формате login@password", Id);
-
+                                await server.SinglecastMessageAsync("400@Ожидаются данные в формате login@password", Id);
 
                             }
                             if (IsAuthorized)
@@ -117,6 +112,52 @@ namespace Server.Models.Client
                         }
                         else if (message.StartsWith("-reg "))
                         {
+                            Console.WriteLine($"Клиент {Client.Client.RemoteEndPoint} - запросил регистрацию.");
+                            message = message.Trim().Substring(5);
+                            string[] userData = message.Trim().Split('@');
+
+
+                            try
+                            {
+                                string new_user_name = userData[0];
+                                string new_user_login = userData[1];
+                                string new_user_password = userData[2];
+                                await DatabasePostgreSql.Instance.AddUser(new NewUser(name:new_user_name, login:new_user_login, password:new_user_password));
+                                await  server.SinglecastMessageAsync("201@created", Id);
+                                Console.WriteLine($"Клиент {Client.Client.RemoteEndPoint} - успешно зарегистрирован.");
+
+
+
+
+                            }
+                            catch (IndexOutOfRangeException)
+                            {
+
+                                await server.SinglecastMessageAsync("400@Ожидаются данные в формате name@login@password", Id);
+                                continue;
+
+                            }
+                            catch(NpgsqlException ex)
+                            {
+                                if (ex.Message.Contains("\"users_login_key\""))
+                                {
+                                    await server.SinglecastMessageAsync($"400@user alredy exists", Id);
+
+                                }
+                                else
+                                {
+                                    await server.SinglecastMessageAsync($"400@data error", Id);
+
+                                }
+
+                            }
+                            catch (Exception ex)
+                            {
+                                await server.SinglecastMessageAsync($"400@data error", Id);
+
+                                Console.WriteLine(ex.ToString());
+                            }
+
 
                         }
                         else

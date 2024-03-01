@@ -16,16 +16,18 @@ namespace AvaloniaClient.ViewModels
         #region fields
         private Server _server = Server.Instance;
         private bool _connection;
-        private string _login = string.Empty;
-        private string _password = string.Empty;
-        //IDatabase database = DatabasePostgreSql.Instance;
-
         public bool Connection
         {
             get { return _connection; }
             set { this.RaiseAndSetIfChanged(ref _connection, value); }
 
         }
+
+        private string _login = string.Empty;
+        private string _password = string.Empty;
+        //IDatabase database = DatabasePostgreSql.Instance;
+
+
 
         public string Login {
             get { return _login; }
@@ -62,7 +64,6 @@ namespace AvaloniaClient.ViewModels
 
         public async void OpenRegisterWindow()
         {
-            RefreshConnectionStatus();
 
             Log.Debug($"Button with OpenRegisterWindowCommand was clicked!");
             WindowManager.ShowRegWindow();
@@ -108,7 +109,7 @@ namespace AvaloniaClient.ViewModels
 
                 RefreshConnectionStatus(); // обновляет состояние окна пользовательского интерфейса
 
-                Log.Debug($"Failure to send data to the server {ex.Message}");
+                Log.Debug($"Failure to receive data from the server {ex.Message}");
                 return;
             }
 

@@ -18,7 +18,7 @@
 		<vm:RegWindowViewModel></vm:RegWindowViewModel>
 	</Design.DataContext>
 	<Window.Styles>
-		<StyleInclude Source="/Styles/AuthWindowStyles.axaml"/>
+		<StyleInclude Source="/Styles/BaseWindowStyles.axaml"/>
 	</Window.Styles>
 
 
@@ -34,7 +34,7 @@
 			<TextBox Name="TextBoxPassword" Classes="base" Watermark="Enter your password" Text="{Binding Path=Password}"/>
 			<Button IsEnabled="{Binding Connection}"   Name="ButtonRegister" Content="Reg" Command="{Binding RegUserCommand}" Classes="base" />
 			<TextBlock IsVisible="{Binding !Connection}" Classes="base" >Sorry,the server is disabled!</TextBlock>
-			<TextBlock IsVisible="{Binding ResponseReceived}" Classes="base" Text="{Binding ResponseInfo}" ></TextBlock>
+			<TextBlock IsVisible="{Binding ResponseReceived}" Classes="error" Text="{Binding ResponseInfo} Col" ></TextBlock>
 
 
 			<!--

@@ -15,7 +15,7 @@
 	</Design.DataContext>
 
 	<Window.Styles>
-		<StyleInclude Source="/Styles/AuthWindowStyles.axaml"/>
+		<StyleInclude Source="/Styles/BaseWindowStyles.axaml"/>
 	</Window.Styles>
 
 

@@ -89,12 +89,15 @@ namespace Models.Database
             catch (NpgsqlException ex)
             {
                 Log.Error($"Error when adding a new user to Users table name: {user.Name} password: {user.Password} login: {user.Login}\n {ex.Message}");
+                throw ex;
 
             }
             catch (Exception ex)
             {
 
                 Log.Error($"Error when adding a new user to Users table name: {user.Name}  password:  {user.Password} login: {user.Login}\n {ex.ToString()}");
+                throw ex;
+
             }
             finally
             {
