@@ -5,12 +5,9 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Tmds.DBus.Protocol;
 
 namespace AvaloniaClient.Models.Backend
 {
