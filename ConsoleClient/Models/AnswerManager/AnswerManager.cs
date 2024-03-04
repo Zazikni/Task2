@@ -35,6 +35,8 @@ namespace ConsoleClient.Models.AnswerManager
                     int id = Convert.ToInt32(response_data[0]);
                     int status_code = Convert.ToInt32(response_data[1]);
                     string message = response_data[2];
+                    Log.Debug($"Разбор ответа сервера {response} - успешно.");
+
                     return new ServerResponse(status_code: status_code, message: message, id: id);
 
                 }
