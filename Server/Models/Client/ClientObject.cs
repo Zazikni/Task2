@@ -4,6 +4,7 @@ using Server.Models.Server;
 using System.Net.Sockets;
 using Models.Users;
 using Npgsql;
+using Serilog;
 
 namespace Server.Models.Client
 {
@@ -67,41 +68,47 @@ namespace Server.Models.Client
                         message = await Reader.ReadLineAsync();
                         if (message == null) continue;
                         Console.WriteLine($"Получены данные от клиента {Client.Client.RemoteEndPoint}. Данные: {message}");
+                        Log.Information($"Получены данные от клиента {Client.Client.RemoteEndPoint}. Данные: {message}");
                         if (message.Contains("-spam"))
                         {
 
 
-                            Console.WriteLine($"Клиент {Client.Client.RemoteEndPoint} - запросил {(_spamAllowed?"отключение":"подключение")} рассылки.");
+                            Log.Debug($"Клиент {Client.Client.RemoteEndPoint} - запросил {(_spamAllowed?"отключение":"подключение")} рассылки.");
                             int request_id = Convert.ToInt32(message.Remove(9));
-                            try
-                            {
-                                string[] userData = message.Trim().Split('@');
+                            //try
+                            //{
+                            //    string[] userData = message.Trim().Split('@');
 
-                            }
-                            catch(IndexOutOfRangeException)
-                            {
-                                await server.SinglecastMessageAsync($"{request_id}@400@Неправильный формат входных данных.", Id);
-                            }
-                            catch
-                            {
+                            //}
+                            //catch(IndexOutOfRangeException)
+                            //{
+                            //    Log.Information($"{request_id}@400@Неправильный формат входных данных.");
+                            //    await server.SinglecastMessageAsync($"{request_id}@400@Неправильный формат входных данных.", Id);
+                            //}
+                            //catch
+                            //{
 
-                            }
+                            //}
 
                             if (!IsAuthorized)
                             {
+                                Log.Information($"{request_id}@400@Доступ запрещен.");
+
                                 await server.SinglecastMessageAsync($"{request_id}@400@Доступ запрещен.", Id);
                                 continue;
                             }
                             else
                             {
+                                _spamAllowed = !_spamAllowed;
+                                Log.Information($"{request_id}@200@ОК");
                                 await server.SinglecastMessageAsync($"{request_id}@200@ОК", Id);
                             }
 
-                            _spamAllowed = !_spamAllowed;
 
                         }
                         else if(message.Contains("-auth"))
                         {
+                            Log.Information($"Клиент {Client.Client.RemoteEndPoint} - запросил аутентификацию.");
                             Console.WriteLine($"Клиент {Client.Client.RemoteEndPoint} - запросил аутентификацию.");
                             int request_id = Convert.ToInt32(message.Remove(9));
 
@@ -116,18 +123,22 @@ namespace Server.Models.Client
 
                             catch (IndexOutOfRangeException)
                             {
+                                Log.Information($"{request_id}@400@Неправильный формат входных данных.");
                                 await server.SinglecastMessageAsync($"{request_id}@400@Неправильный формат входных данных.", Id);
 
                             }
                             if (IsAuthorized)
                             {
+
                                 login = userData[2];
                                 password = userData[3];
+                                Log.Information($"{request_id}@200@Доступ разрешен.");
                                 await server.SinglecastMessageAsync($"{request_id}@200@Доступ разрешен.", Id);
 
                             }
                             else
                             {
+                                Log.Information($"{request_id}@403@Доступ запрещен.");
                                 await server.SinglecastMessageAsync($"{request_id}@403@Доступ запрещен.", Id);
                                 Console.WriteLine($"Клиент {Client.Client.RemoteEndPoint} - не прошел аутентификацию.");
                             }
@@ -135,6 +146,7 @@ namespace Server.Models.Client
                         }
                         else if (message.Contains("-reg"))
                         {
+                            Log.Information($"Клиент {Client.Client.RemoteEndPoint} - запросил регистрацию.");
                             Console.WriteLine($"Клиент {Client.Client.RemoteEndPoint} - запросил регистрацию.");
                             int request_id = Convert.ToInt32(message.Remove(9));
                             string[] userData = message.Trim().Split('@');
@@ -147,6 +159,8 @@ namespace Server.Models.Client
                                 string new_user_password = userData[4];
                                 await DatabasePostgreSql.Instance.AddUser(new NewUser(name:new_user_name, login:new_user_login, password:new_user_password));
                                 await  server.SinglecastMessageAsync($"{request_id}@201@Пользователь успешно зарегистрирован.", Id);
+                                Log.Information($"{request_id}@201@Пользователь успешно зарегистрирован.");
+
                                 Console.WriteLine($"Клиент {Client.Client.RemoteEndPoint} - успешно зарегистрирован.");
 
 
@@ -164,11 +178,13 @@ namespace Server.Models.Client
                             {
                                 if (ex.Message.Contains("\"users_login_key\""))
                                 {
+                                    Log.Information($"{request_id}@400@Пользователь уже зарегистрирован.");
                                     await server.SinglecastMessageAsync($"{request_id}@400@Пользователь уже зарегистрирован.", Id);
 
                                 }
                                 else
                                 {
+                                    Log.Information($"{request_id}@400@Неправильный формат входных данных.");
                                     await server.SinglecastMessageAsync($"{request_id}@400@Неправильный формат входных данных.", Id);
 
                                 }
@@ -176,6 +192,7 @@ namespace Server.Models.Client
                             }
                             catch (Exception ex)
                             {
+                                Log.Information($"{request_id}@400@Неправильный формат входных данных.");      
                                 await server.SinglecastMessageAsync($"{request_id}@400@Неправильный формат входных данных.", Id);
 
                                 Console.WriteLine(ex.ToString());
@@ -185,14 +202,15 @@ namespace Server.Models.Client
                         }
                         else
                         {
-                            //await server.SinglecastMessageAsync($"0@404@Неправильный формат входных данных.", Id);
+                            await server.SinglecastMessageAsync($"@404@Ресурс не найден.", Id);
 
                         }
 
                     }
                     catch
                     {
-                        message = $"{login} отключился.";
+                        message = $"Клиент {Client.Client.RemoteEndPoint} отключился.";
+                        Log.Information(message);
                         Console.WriteLine(message);
                         break;
                     }
@@ -200,6 +218,7 @@ namespace Server.Models.Client
             }
             catch (Exception e)
             {
+                Log.Information(e.Message);
                 Console.WriteLine(e.Message);
             }
             finally
