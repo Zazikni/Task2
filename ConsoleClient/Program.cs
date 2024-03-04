@@ -1,6 +1,8 @@
-﻿using Backend;
-using System.Net.Sockets;
+﻿using System.Net.Sockets;
 using System.Text;
+using ConsoleClient.Models.AnswerManager;
+using ConsoleClient.Models.Backend;
+using ConsoleClient.Models.Logging;
 
 namespace ConsoleClient
 {
@@ -99,9 +101,26 @@ namespace ConsoleClient
         {
             new LoggerInit();
             ConnectionService.Instance.Start();
+            // запускаем новый поток для получения данных
+            Task.Run(() => GetAllResponses());
             while (true)
             {
-                ConnectionService.Instance.Add(Console.ReadLine());
+                ConnectionService.Instance.AddRequest(new ServerRequest(Console.ReadLine()));
+            }
+        }
+
+        private static async Task GetAllResponses()
+        {
+
+            while (true)
+            {
+                foreach (ServerResponse response in ConnectionService.Instance.Responses)
+                {
+                    Console.WriteLine(response.ToString());
+                    ConnectionService.Instance.Responses.Remove(response);
+                }
+                await Task.Delay(500);
+
             }
         }
     }

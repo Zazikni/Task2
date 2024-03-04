@@ -4,7 +4,7 @@ using System.Configuration;
 using System;
 
 
-namespace Backend
+namespace ConsoleClient.Models.Logging
 {/// <summary>
 /// Инициализирует базовый Logger из библиотеки Serilog.
 /// </summary>
@@ -20,6 +20,7 @@ namespace Backend
                         .WriteTo.File(path: "logs/warn-.log", restrictedToMinimumLevel: LogEventLevel.Warning, rollingInterval: RollingInterval.Day, rollOnFileSizeLimit: true, fileSizeLimitBytes: logFileSize)
                         .WriteTo.File(path: "logs/error-.log", restrictedToMinimumLevel: LogEventLevel.Error, rollingInterval: RollingInterval.Day, rollOnFileSizeLimit: true, fileSizeLimitBytes: logFileSize)
                         .CreateLogger();
+            Log.Debug("Логер инициализирован.");
         }
     }
 }

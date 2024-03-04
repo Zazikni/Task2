@@ -1,15 +1,10 @@
-﻿using Serilog;
-using System;
-using System.Collections.Generic;
+﻿using ConsoleClient.Models.AnswerManager;
+using Serilog;
 using System.Configuration;
-using System.IO;
-using System.Linq;
+using System.Diagnostics;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace Backend
+namespace ConsoleClient.Models.Backend
 {
     internal class ConnectionService
     {
@@ -29,19 +24,28 @@ namespace Backend
         private string _host = ConfigurationManager.AppSettings["ServerHost"];
         public string Host { get { return _host; } }
         private int _port = Convert.ToInt32(ConfigurationManager.AppSettings["ServerPort"]);
-        private int _monitoring_cd = Convert.ToInt32(ConfigurationManager.AppSettings["ServerPort"]);
         private int _sendDelayIfNoConnection = Convert.ToInt32(ConfigurationManager.AppSettings["SendingDelayIfNoConnection"]);
         private int _reciveDelayIfNoConnection = Convert.ToInt32(ConfigurationManager.AppSettings["ReadingDelayIfNoConnection"]);
         private int _monitoringDelay = Convert.ToInt32(ConfigurationManager.AppSettings["MonitoringDelay"]);
+        //private int _answerTimeout = Convert.ToInt32(ConfigurationManager.AppSettings["MonitoringDelay"]);
+        private int _responseIterationDelay = Convert.ToInt32(ConfigurationManager.AppSettings["ResponseIterationDelay"]);
         public int Port { get { return _port; } }
         private TcpClient _tcpClient;
         public TcpClient Client { get { return _tcpClient; } }
         private StreamReader? Reader = null;
         private StreamWriter? Writer = null;
-        private List<string> requests = new List<string>();
+        private List<ServerRequest> requests = new List<ServerRequest>();
         private List<ServerResponse> responses = new List<ServerResponse>();
+        public List<ServerResponse> Responses { get { return responses; } }
         private Thread monitoringThread;
         private bool monitoringIsRunning = true;
+
+
+        #endregion
+
+        #region delegate
+        public delegate void WhenConnectionStatusChangeDelegate();
+        private WhenConnectionStatusChangeDelegate _delegateChain;
 
 
         #endregion
@@ -50,14 +54,32 @@ namespace Backend
         private ConnectionService()
         {
             _tcpClient = new TcpClient();
+            _delegateChain  += SimpleCallbackWhenConnectionResumed;
 
         }
         #endregion
 
         #region methods
+        // Метод для добавления обработчиков к делегату.
+        public void AddCallback(WhenConnectionStatusChangeDelegate del)
+        {
+            _delegateChain += del;
+        }
+
+        // Метод для удаления обработчиков из делегата.
+        public void RemoveCallback(WhenConnectionStatusChangeDelegate del)
+        {
+            _delegateChain -= del;
+        }
+        // Метод, вызывающий делегат.
+        private void ExecuteCallback()
+        {
+            // Вызываем делегат.
+            _delegateChain?.Invoke();
+        }
         public void Start()
         {
-            
+
             Connect();
             // запускаем новый поток для мониторинга соеденения
             monitoringThread = new Thread(MonitorConnection) { IsBackground = true };
@@ -86,6 +108,7 @@ namespace Backend
 
                 if (!Client.Connected) //TODO тут следовало бы сделать какую нибудь более надежную логику проверки соеденения. Но то что есть - тоже будет работать.
                 {
+                    ExecuteCallback();
                     Log.Information("Соеденение потерянно. Переподклюение...");
                     Connect(); // Попытка переподключения
                 }
@@ -108,6 +131,9 @@ namespace Backend
                     Reader = new StreamReader(Client.GetStream());
                     Writer = new StreamWriter(Client.GetStream());
                     Log.Information($"Соеденение с сервером {Host}:{Port} - установлено. Успешная попытка: {attempt}.");
+                    ExecuteCallback();
+
+
 
                     break;
 
@@ -115,10 +141,10 @@ namespace Backend
                 catch (SocketException ex)
                 {
                     Log.Debug($"Ошибка подключения {Host}:{Port} {ex.Message}");
-                    attempt ++;
+                    attempt++;
 
                 }
-                
+
 
             }
 
@@ -145,10 +171,19 @@ namespace Backend
                         string? message = await Reader.ReadLineAsync();
                         Log.Debug($"C cервера {Host}:{Port} пришло нвовое сообщение");
 
-                        // если пустой ответ, ничего не выводим на консоль
+                        // если пустой ответ, пропускаем
                         if (string.IsNullOrEmpty(message)) continue;
-                        Console.WriteLine($"{message}\n");
-                        // TODO наполнение списка ответов
+                        try
+                        {
+                            ServerResponse response =  await AnswerManager.AnswerManager.GetResponse(message);
+                            responses.Add(response);
+                        }
+                        catch 
+                        {
+                            continue;
+                        }
+
+
 
                     }
 
@@ -170,17 +205,17 @@ namespace Backend
         {
             Log.Information($"Запущен процесс отправки сообщений на сервер {Host}:{Port}");
 
-            string message;
+            ServerRequest request;
 
             while (true)
             {
-                if(Client.Connected && requests.Count > 0)
+                if (Client.Connected && requests.Count > 0)
                 {
-                    message = requests[0];
-                    Log.Information($"Отправка сообщения {message}");
+                    request = requests[0];
+                    Log.Information($"Отправка сообщения {request.ToString()}");
                     try
                     {
-                        await Writer.WriteLineAsync(message);
+                        await Writer.WriteLineAsync(request.ToString());
                         await Writer.FlushAsync();
                     }
                     catch (Exception ex)
@@ -188,9 +223,9 @@ namespace Backend
                         Log.Information($"Ошибка соеденения {Host}:{Port} {ex.Message}");
                         continue;
                     }
-                    
-                    requests.Remove(message);
-                
+
+                    requests.Remove(request);
+
 
                 }
                 else
@@ -200,10 +235,42 @@ namespace Backend
             }
 
         }
-        public void Add(string message)
+        private void SimpleCallbackWhenConnectionResumed()
         {
-            requests.Add(message);
+            Log.Debug("Статус соеденения изменился - обработка события делегатом.");
         }
+        public void AddRequest(ServerRequest request)
+        {
+            requests.Add(request);
+        }
+        public async Task<ServerResponse> GetResponseAsync(int response_id, TimeSpan timeout)
+        {
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            // TODO стоило бы как-то оптимизировать этот метод
+            while (true)
+            {
+                foreach (ServerResponse response in responses)
+                {
+                    if (response.Id == response_id)
+                    {
+                        responses.Remove(response);
+                        return response;
+                    }
+
+                }
+                if (stopwatch.Elapsed > timeout)
+                {
+                    stopwatch.Stop();
+                    throw new TimeoutException($"Ожидание ответа привысило {timeout.TotalSeconds} секунд.");
+
+                }
+                await Task.Delay(_responseIterationDelay);
+
+            }
+            
+
+
+            }
         #endregion
 
     }
