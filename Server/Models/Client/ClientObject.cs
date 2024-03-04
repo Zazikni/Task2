@@ -202,7 +202,7 @@ namespace Server.Models.Client
                         }
                         else
                         {
-                            await server.SinglecastMessageAsync($"@404@Ресурс не найден.", Id);
+                            await server.SinglecastMessageAsync($"404@404@Ресурс не найден.", Id);
 
                         }
 
