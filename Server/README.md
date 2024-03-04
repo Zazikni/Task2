@@ -21,12 +21,15 @@
 ***
 #### Дополнительная информация
 ##### Команды
- > -auth login@password
 
- > -spam
+ > -id@-auth@login@password
+
+
+ > -id@-reg@name@login@password
+
+
+ > -id@-spam
  ***
-База данных: PostgreSql
-***
 Таблица:
 
 ```
