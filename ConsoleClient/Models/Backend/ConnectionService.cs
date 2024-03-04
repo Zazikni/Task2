@@ -175,8 +175,10 @@ namespace ConsoleClient.Models.Backend
                         if (string.IsNullOrEmpty(message)) continue;
                         try
                         {
+                            Log.Debug($"Сообщение {message}");
                             ServerResponse response =  await AnswerManager.AnswerManager.GetResponse(message);
                             responses.Add(response);
+                            Console.WriteLine($"{message}");
                         }
                         catch 
                         {
