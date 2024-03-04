@@ -16,7 +16,7 @@ namespace AvaloniaClient
 
         public override void OnFrameworkInitializationCompleted()
         {
-            new LoggerInit();
+            
 
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {

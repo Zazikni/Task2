@@ -1,6 +1,7 @@
 ﻿using AvaloniaClient.Models.AnswerManager;
 using AvaloniaClient.Models.Backend;
 using AvaloniaClient.Models.WindowManager;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using ReactiveUI;
 using Serilog;
 using System;
@@ -14,7 +15,7 @@ namespace AvaloniaClient.ViewModels
     {
 
         #region fields
-        private Server _server = Server.Instance;
+        //private Server _server = Server.Instance;
         private bool _connection;
         public bool Connection
         {
@@ -49,14 +50,11 @@ namespace AvaloniaClient.ViewModels
         #region constructors
         public AuthWindowViewModel()
         {
-            _connection = _server.Client.Connected;
+            _connection = ConnectionService.Instance.Client.Connected;
+            ConnectionService.Instance.AddCallback(RefreshConnectionStatus);
             OpenRegisterWindowCommand = ReactiveCommand.Create(OpenRegisterWindow);
             AuthUserCommand = ReactiveCommand.Create(AuthUserByLogPass);
-            if (!Connection)
-            {
-                Task.Run(() => _server.Reconnect(RefreshConnectionStatus));
 
-            }
         }
         #endregion
 
@@ -64,7 +62,6 @@ namespace AvaloniaClient.ViewModels
 
         public async void OpenRegisterWindow()
         {
-
             Log.Debug($"Button with OpenRegisterWindowCommand was clicked!");
             WindowManager.ShowRegWindow();
 
@@ -75,7 +72,8 @@ namespace AvaloniaClient.ViewModels
         {
             Log.Debug($"Button from AuthWindow with AuthUserCommand was clicked!");
             Log.Debug($"TextBoxLogin: {Login}\tTextBoxPassword:{Password}");
-            ServerResponse access ;
+            ServerResponse response ;
+            ServerRequest request;
             if (String.IsNullOrEmpty(Login) || String.IsNullOrEmpty(Password))
             {
                 Log.Information($"Incorrect data.");
@@ -86,37 +84,23 @@ namespace AvaloniaClient.ViewModels
                 Log.Information($"Incorrect data.");
                 return;
             }
+            request = new ServerRequest(command: "-auth", message:$"{Login}@{Password}");
+            ConnectionService.Instance.AddRequest(request);
             try
             {
-                
-                await _server.SendMessageAsync($"-auth {Login}@{Password}");
+                response = await ConnectionService.Instance.GetResponseAsync(response_id:request.Id, timeout: TimeSpan.FromSeconds(2));
             }
-            catch (SocketException ex)
-
+            catch(TimeoutException ex)
             {
-                Task.Run(() => _server.Reconnect(RefreshConnectionStatus)); // если не удалось отправить - будет переподключаться к серверу.
-                RefreshConnectionStatus(); // обновляет состояние окна пользовательского интерфейса
-                Log.Debug($"Failure to send data to the server {ex.Message}");
-                return;
-            }
-            try
-            {
-                access = await AnswerManager.AccessResponse( await _server.ReceiveMessageAsync()); // получает ответ от сервера и преобразовывает его
-                Log.Debug($"Response.StatusCode =  {access.StatusCode} Response.Message =  {access.Message}");
-            }
-            catch (SocketException ex)
-            {
-
-                RefreshConnectionStatus(); // обновляет состояние окна пользовательского интерфейса
-
-                Log.Debug($"Failure to receive data from the server {ex.Message}");
+                Log.Information($"Запрос {request.Id} TimeoutException");
                 return;
             }
 
             Login = String.Empty;
             Password = String.Empty;
-            if( access.StatusCode == StatusCodes.OK )
+            if( response.StatusCode == StatusCodes.OK )
             {
+                ConnectionService.Instance.RemoveCallback(RefreshConnectionStatus);
                 WindowManager.CloseRegWindow();
                 WindowManager.SwitchToMainWindow();
                 
@@ -128,8 +112,8 @@ namespace AvaloniaClient.ViewModels
         #region methods
         public async void RefreshConnectionStatus()
         {
-            Log.Debug($"RefreshConnectionStatus _server.Connected - {_server.Client.Connected}");
-            Connection = _server.Client.Connected;
+            Log.Debug($"RefreshConnectionStatus ConnectionService.Instance.Client.Connected - {ConnectionService.Instance.Client.Connected}");
+            Connection = ConnectionService.Instance.Client.Connected;
 
         }
         #endregion

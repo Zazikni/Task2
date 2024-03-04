@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Tmds.DBus.Protocol;
 
-namespace AvaloniaClient.Models.AnswerManager
+namespace Backend
 {
     enum StatusCodes
     {
-       SPAM = 000,
        OK = 200,
        CREATED = 201,
        ACCEPTED = 202,
@@ -20,23 +18,21 @@ namespace AvaloniaClient.Models.AnswerManager
        NOT_FOUND  = 404
 
     }
-    internal class ServerResponse:IServerMessage
+    internal class ServerResponse
     {
         #region fields
         private StatusCodes _status;
         public StatusCodes StatusCode { get { return _status; }}
         private string _message;
         public string Message { get { return _message; }}
-        private int _id;
-        public int Id { get { return _id; }}
         #endregion
 
         #region constructors
-        public ServerResponse(int status_code, string message, int id)
+        public ServerResponse(string response)
         {
-            _status = (StatusCodes)status_code;
-            _message = message;
-            _id = id;
+            string[] response_data = response.Split('@');
+            _status = (StatusCodes)Convert.ToInt32(response_data[0]);
+            _message = response_data[1];
 
         }
         #endregion
