@@ -1,19 +1,19 @@
 ﻿using Models.Database;
-using System.Net.Sockets;
-using System.Net;
-using System.Xml.Linq;
+using Serilog;
 using Server.Models.Client;
 using System.Configuration;
-using Serilog;
+using System.Net;
+using System.Net.Sockets;
 
 namespace Server.Models.Server
 {
-    class ServerObject
+    internal class ServerObject
     {
         private IDatabase _database = DatabasePostgreSql.Instance;
-        public IDatabase Database { get { return _database; } }
-        TcpListener tcpListener = new TcpListener(IPAddress.Any, 8888); // сервер для прослушивания
-        List<ClientObject> clients = new List<ClientObject>(); // все подключения
+        public IDatabase Database
+        { get { return _database; } }
+        private TcpListener tcpListener = new TcpListener(IPAddress.Any, 8888); // сервер для прослушивания
+        private List<ClientObject> clients = new List<ClientObject>(); // все подключения
 
         public async void SpamProcessAsync()
         {
@@ -39,7 +39,6 @@ namespace Server.Models.Server
                     Log.Debug("Сообщения не отправлены -  подключений нет.");
                     Console.WriteLine("Сообщения не отправлены -  подключений нет.");
                     await Task.Delay(timeout);
-
                 }
             }
         }
@@ -73,6 +72,7 @@ namespace Server.Models.Server
                 Disconnect();
             }
         }
+
         protected internal void RemoveConnection(string id)
         {
             // получаем по id закрытое подключение
@@ -85,30 +85,26 @@ namespace Server.Models.Server
         // трансляция сообщения подключенным клиентам
         protected internal async Task BroadcastMessageAsync(string message, string? id = null)
         {
-
             foreach (var client in clients)
             {
                 if (client.Id != id) // если id клиента не равно id отправителя
                 {
                     if (client.SpamAllowed) // разрешена массовая отправка
                     {
-
                         await client.Writer.WriteLineAsync(message); //передача данных
                         await client.Writer.FlushAsync();
                         Log.Information($"Клиент {client.Client.Client.RemoteEndPoint}. Отправлено сообщение {message}");
                         Console.WriteLine($"Клиент {client.Client.Client.RemoteEndPoint}. Отправлено сообщение {message}");
-
                     }
                     else
                     {
-
                         Log.Information($"Клиент {client.Client.Client.RemoteEndPoint}. Рассылка запрещена.");
                         Console.WriteLine($"Клиент {client.Client.Client.RemoteEndPoint}. Рассылка запрещена.");
                     }
-
                 }
             }
         }
+
         // трансляция сообщения одному клиентам
         protected internal async Task SinglecastMessageAsync(string message, string id)
         {
@@ -119,11 +115,10 @@ namespace Server.Models.Server
                     await client.Writer.WriteLineAsync(message); //передача данных
                     await client.Writer.FlushAsync();
                     Log.Information($"Клиент {client.Client.Client.RemoteEndPoint}. Отправлено сообщение {message}");
-
                 }
-
             }
         }
+
         // отключение всех клиентов
         protected internal void Disconnect()
         {

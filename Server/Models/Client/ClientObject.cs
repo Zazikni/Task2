@@ -8,10 +8,12 @@ using Serilog;
 
 namespace Server.Models.Client
 {
-    class ClientObject
+    internal class ClientObject
     {
         #region fields
+
         private bool _isAuthorized;
+
         public bool IsAuthorized
         {
             get
@@ -19,7 +21,9 @@ namespace Server.Models.Client
                 return _isAuthorized;
             }
         }
+
         private bool _spamAllowed = false;
+
         public bool SpamAllowed
         {
             get
@@ -27,19 +31,22 @@ namespace Server.Models.Client
                 return _spamAllowed;
             }
         }
+
         protected internal string Id { get; } = Guid.NewGuid().ToString();
         protected internal StreamWriter Writer { get; }
         protected internal StreamReader Reader { get; }
 
-        TcpClient _client;
-        public TcpClient Client { get { return _client; } }
-        ServerObject server; // объект сервера
-        #endregion
+        private TcpClient _client;
+        public TcpClient Client
+        { get { return _client; } }
+        private ServerObject server; // объект сервера
+
+        #endregion fields
 
         #region constructors
+
         public ClientObject(TcpClient tcpClient, ServerObject serverObject)
         {
-
             _client = tcpClient;
             server = serverObject;
             // получаем NetworkStream для взаимодействия с сервером
@@ -49,9 +56,11 @@ namespace Server.Models.Client
             // создаем StreamWriter для отправки данных
             Writer = new StreamWriter(stream);
         }
-        #endregion
+
+        #endregion constructors
 
         #region methods
+
         public async Task ProcessAsync()
         {
             try
@@ -71,9 +80,7 @@ namespace Server.Models.Client
                         Log.Information($"Получены данные от клиента {Client.Client.RemoteEndPoint}. Данные: {message}");
                         if (message.Contains("-spam"))
                         {
-
-
-                            Log.Debug($"Клиент {Client.Client.RemoteEndPoint} - запросил {(_spamAllowed?"отключение":"подключение")} рассылки.");
+                            Log.Debug($"Клиент {Client.Client.RemoteEndPoint} - запросил {(_spamAllowed ? "отключение" : "подключение")} рассылки.");
                             int request_id = Convert.ToInt32(message.Remove(9));
                             //try
                             //{
@@ -87,7 +94,6 @@ namespace Server.Models.Client
                             //}
                             //catch
                             //{
-
                             //}
 
                             if (!IsAuthorized)
@@ -103,10 +109,8 @@ namespace Server.Models.Client
                                 Log.Information($"{request_id}@200@ОК");
                                 await server.SinglecastMessageAsync($"{request_id}@200@ОК", Id);
                             }
-
-
                         }
-                        else if(message.Contains("-auth"))
+                        else if (message.Contains("-auth"))
                         {
                             Log.Information($"Клиент {Client.Client.RemoteEndPoint} - запросил аутентификацию.");
                             Console.WriteLine($"Клиент {Client.Client.RemoteEndPoint} - запросил аутентификацию.");
@@ -114,27 +118,21 @@ namespace Server.Models.Client
 
                             string[] userData = message.Trim().Split('@');
 
-
                             try
                             {
-
                                 _isAuthorized = await AuthenticationManager.AccessAllowed(login: userData[2], password: userData[3], database: server.Database);
                             }
-
                             catch (IndexOutOfRangeException)
                             {
                                 Log.Information($"{request_id}@400@Неправильный формат входных данных.");
                                 await server.SinglecastMessageAsync($"{request_id}@400@Неправильный формат входных данных.", Id);
-
                             }
                             if (IsAuthorized)
                             {
-
                                 login = userData[2];
                                 password = userData[3];
                                 Log.Information($"{request_id}@200@Доступ разрешен.");
                                 await server.SinglecastMessageAsync($"{request_id}@200@Доступ разрешен.", Id);
-
                             }
                             else
                             {
@@ -142,7 +140,6 @@ namespace Server.Models.Client
                                 await server.SinglecastMessageAsync($"{request_id}@403@Доступ запрещен.", Id);
                                 Console.WriteLine($"Клиент {Client.Client.RemoteEndPoint} - не прошел аутентификацию.");
                             }
-
                         }
                         else if (message.Contains("-reg"))
                         {
@@ -151,61 +148,47 @@ namespace Server.Models.Client
                             int request_id = Convert.ToInt32(message.Remove(9));
                             string[] userData = message.Trim().Split('@');
 
-
                             try
                             {
                                 string new_user_name = userData[2];
                                 string new_user_login = userData[3];
                                 string new_user_password = userData[4];
-                                await DatabasePostgreSql.Instance.AddUser(new NewUser(name:new_user_name, login:new_user_login, password:new_user_password));
-                                await  server.SinglecastMessageAsync($"{request_id}@201@Пользователь успешно зарегистрирован.", Id);
+                                await DatabasePostgreSql.Instance.AddUser(new NewUser(name: new_user_name, login: new_user_login, password: new_user_password));
+                                await server.SinglecastMessageAsync($"{request_id}@201@Пользователь успешно зарегистрирован.", Id);
                                 Log.Information($"{request_id}@201@Пользователь успешно зарегистрирован.");
 
                                 Console.WriteLine($"Клиент {Client.Client.RemoteEndPoint} - успешно зарегистрирован.");
-
-
-
-
                             }
                             catch (IndexOutOfRangeException)
                             {
-
                                 await server.SinglecastMessageAsync("400", Id);
                                 continue;
-
                             }
-                            catch(NpgsqlException ex)
+                            catch (NpgsqlException ex)
                             {
                                 if (ex.Message.Contains("\"users_login_key\""))
                                 {
                                     Log.Information($"{request_id}@400@Пользователь уже зарегистрирован.");
                                     await server.SinglecastMessageAsync($"{request_id}@400@Пользователь уже зарегистрирован.", Id);
-
                                 }
                                 else
                                 {
                                     Log.Information($"{request_id}@400@Неправильный формат входных данных.");
                                     await server.SinglecastMessageAsync($"{request_id}@400@Неправильный формат входных данных.", Id);
-
                                 }
-
                             }
                             catch (Exception ex)
                             {
-                                Log.Information($"{request_id}@400@Неправильный формат входных данных.");      
+                                Log.Information($"{request_id}@400@Неправильный формат входных данных.");
                                 await server.SinglecastMessageAsync($"{request_id}@400@Неправильный формат входных данных.", Id);
 
                                 Console.WriteLine(ex.ToString());
                             }
-
-
                         }
                         else
                         {
                             await server.SinglecastMessageAsync($"404@404@Ресурс не найден.", Id);
-
                         }
-
                     }
                     catch
                     {
@@ -227,6 +210,7 @@ namespace Server.Models.Client
                 server.RemoveConnection(Id);
             }
         }
+
         // закрытие подключения
         protected internal void Close()
         {
@@ -234,6 +218,7 @@ namespace Server.Models.Client
             Reader.Close();
             _client.Close();
         }
-        #endregion
+
+        #endregion methods
     }
 }

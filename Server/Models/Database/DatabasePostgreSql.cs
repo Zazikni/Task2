@@ -1,9 +1,8 @@
-﻿using Serilog;
-using System.Configuration;
+﻿using Models.Security;
 using Models.Users;
 using Npgsql;
-using Models.Security;
-
+using Serilog;
+using System.Configuration;
 
 namespace Models.Database
 {
@@ -15,9 +14,11 @@ namespace Models.Database
     internal class DatabasePostgreSql : IDatabase
     {
         #region fields
-        string _connectionString;
-        NpgsqlDataSource _dataSource;
+
+        private string _connectionString;
+        private NpgsqlDataSource _dataSource;
         private static DatabasePostgreSql? _instance = null;
+
         public static DatabasePostgreSql Instance
         {
             get
@@ -29,14 +30,14 @@ namespace Models.Database
                 return _instance;
             }
         }
-        #endregion
+
+        #endregion fields
 
         #region constructors
-        private DatabasePostgreSql()
-            
-            
-        {
 
+        private DatabasePostgreSql()
+
+        {
             NpgsqlConnectionStringBuilder _csb = new NpgsqlConnectionStringBuilder();
             _csb.Host = ConfigurationManager.AppSettings["PostgreHost"];
             _csb.Database = ConfigurationManager.AppSettings["PostgreDatabase"];
@@ -46,16 +47,15 @@ namespace Models.Database
             _connectionString = _csb.ToString();
             var dataSourceBuilder = new NpgsqlDataSourceBuilder(_connectionString);
             _dataSource = dataSourceBuilder.Build();
-
-
         }
-        #endregion
+
+        #endregion constructors
 
         #region methods
 
         private async Task _init()
         {
-            var x =  AddUser(new NewUser(name: "Nikita", login: "zazik", password: "K2342^%&KNKNKJw4cw3c4wr"));
+            var x = AddUser(new NewUser(name: "Nikita", login: "zazik", password: "K2342^%&KNKNKJw4cw3c4wr"));
             var y = AddUser(new NewUser(name: "Oleg", login: "katsd", password: "712876asKasdsassdr"));
             var z = AddUser(new NewUser(name: "Billy", login: "billy212", password: "45466&%#dt56asdasd."));
             await x;
@@ -64,9 +64,8 @@ namespace Models.Database
 
             var w = GetUser("zazik");
             await w;
-
-
         }
+
         /// <summary>
         /// Метод для добавления нового пользователя в базу данных.
         /// </summary>
@@ -83,34 +82,29 @@ namespace Models.Database
                 _command.Parameters.AddWithValue("@password", PasswordHasher.CreateSHA256(user.Password));
                 await _command.ExecuteNonQueryAsync();
                 Log.Debug($"Add new user to database login: {user.Login} \t name: {user.Name}");
-
-
             }
             catch (NpgsqlException ex)
             {
                 Log.Error($"Error when adding a new user to Users table name: {user.Name} password: {user.Password} login: {user.Login}\n {ex.Message}");
                 throw ex;
-
             }
             catch (Exception ex)
             {
-
                 Log.Error($"Error when adding a new user to Users table name: {user.Name}  password:  {user.Password} login: {user.Login}\n {ex.ToString()}");
                 throw ex;
-
             }
             finally
             {
                 await connection.DisposeAsync();
             }
         }
+
         /// <summary>
         /// Метод для извлечения данных о пользователе из базы данных.
         /// </summary>
 
         public async Task<User?> GetUser(string login)
         {
-            
             var connection = await _dataSource.OpenConnectionAsync();
             try
             {
@@ -130,24 +124,18 @@ namespace Models.Database
 
                     Log.Debug($"{db_login} \t {db_name} \t {db_password} \t {db_id}");
                     return new User(name: db_name, login: db_login, password: db_password, id: db_id);
-
                 }
                 else
                 {
                     Log.Warning($"DatabasePostgreSql.GetUser reader.HasRows return False");
-
                 }
-
-
             }
             catch (NpgsqlException ex)
             {
                 Log.Error($"Error wile selecting User from table login: {login}\n{ex.ToString()}");
-
             }
             catch (Exception ex)
             {
-
                 Log.Error($"Error wile selecting User from table login: {login}\n{ex.ToString()}");
             }
             finally
@@ -155,10 +143,8 @@ namespace Models.Database
                 await connection.DisposeAsync();
             }
             return null;
-
         }
-        #endregion
 
+        #endregion methods
     }
 }
-

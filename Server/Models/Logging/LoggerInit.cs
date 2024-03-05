@@ -1,8 +1,6 @@
 ﻿using Serilog;
 using Serilog.Events;
 using System.Configuration;
-using System;
-
 
 namespace Models.Logging
 {/// <summary>

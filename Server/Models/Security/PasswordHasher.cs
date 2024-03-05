@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 
 namespace Models.Security
 {
@@ -8,15 +7,8 @@ namespace Models.Security
     /// </summary>
     internal static class PasswordHasher
     {
-        #region fields
-
-        #endregion
-
-        #region constructors
-
-        #endregion
-
         #region methods
+
         /// <summary>
         /// Хеширует строку алгоритмом SHA-256.
         /// </summary>
@@ -25,6 +17,7 @@ namespace Models.Security
             using System.Security.Cryptography.SHA256 hash = System.Security.Cryptography.SHA256.Create();
             return Convert.ToHexString(hash.ComputeHash(Encoding.ASCII.GetBytes(input)));
         }
+
         /// <summary>
         /// Хеширует строку алгоритмом SHA-256 и сверяет ее другой строкой.
         /// </summary>
@@ -32,6 +25,7 @@ namespace Models.Security
         {
             return hash.Equals(CreateSHA256(password));
         }
-        #endregion
+
+        #endregion methods
     }
 }
