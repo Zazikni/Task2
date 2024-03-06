@@ -89,12 +89,12 @@ namespace AvaloniaClient.ViewModels
 
             if (String.IsNullOrEmpty(Name) || String.IsNullOrEmpty(Login) || String.IsNullOrEmpty(Password))
             {
-                Log.Information($"Окно регистрации. Неверне данные.");
+                Log.Information($"Окно регистрации. Данные не введены.");
                 return;
             }
             if (String.IsNullOrWhiteSpace(Name) || String.IsNullOrWhiteSpace(Login) || String.IsNullOrWhiteSpace(Password))
             {
-                Log.Information($"Окно регистрации. Неверне данные.");
+                Log.Information($"Окно регистрации. Данные не введены или состоят из пробелов.");
                 return;
             }
             request = new ServerRequest(command: "-reg", message: $"{Name}@{Login}@{Password}");
@@ -128,7 +128,7 @@ namespace AvaloniaClient.ViewModels
 
         public async void RefreshConnectionStatus()
         {
-            Log.Debug($"Окно регистрации. Обновление статуса соеденения. Соеденение - {(ConnectionService.Instance.Client.Connected?"Установлено":"Потеряно")}");
+            Log.Debug($"Окно регистрации. Обновление статуса соеденения. Соеденение - {(ConnectionService.Instance.Client.Connected ? "Установлено" : "Потеряно")}");
             Connection = ConnectionService.Instance.Client.Connected;
         }
 

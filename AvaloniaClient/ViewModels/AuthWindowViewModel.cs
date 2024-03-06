@@ -76,12 +76,12 @@ namespace AvaloniaClient.ViewModels
             ServerRequest request;
             if (String.IsNullOrEmpty(Login) || String.IsNullOrEmpty(Password))
             {
-                Log.Information($"Окно аутентификации. Неверне данные.");
+                Log.Information($"Окно аутентификации. Данные не введены.");
                 return;
             }
             if (String.IsNullOrWhiteSpace(Login) || String.IsNullOrWhiteSpace(Password))
             {
-                Log.Information($"Окно аутентификации. Неверне данные.");
+                Log.Information($"Окно аутентификации. Данные не введены или состоят из пробелов.");
                 return;
             }
             request = new ServerRequest(command: "-auth", message: $"{Login}@{Password}");
@@ -115,6 +115,7 @@ namespace AvaloniaClient.ViewModels
             Log.Debug($"Окно аутентификации. Обновление статуса соеденения. Соеденение - {(ConnectionService.Instance.Client.Connected ? "Установлено" : "Потеряно")}");
             Connection = ConnectionService.Instance.Client.Connected;
         }
+
 
         #endregion Methods
     }
