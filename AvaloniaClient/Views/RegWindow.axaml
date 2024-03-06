@@ -36,13 +36,13 @@
 			<TextBox Name="PasswordBox" Classes="base" Watermark="Enter your password" Text="{Binding Path=Password}"/>
 			
 			<TextBlock Text="Confirm Password" Classes="base" />
-			<TextBox Name="ConfirmPasswordBox" Classes="base" Watermark="Enter your password" Text="{Binding Path=Password}"/>
+			<TextBox Name="ConfirmPasswordBox" Classes="base" Watermark="Enter your password"/>
 			
-			<TextBlock Name="ValidationTextBlock" Foreground="Red" IsEnabled="False"/>
+			<TextBlock Name="ValidationTextBlock" Foreground="Red" IsVisible="False" Classes="base"/>
 			
-			<Button IsEnabled="{Binding Connection}"   x:Name="ButtonRegister" Content="Reg" Command="{Binding RegUserCommand}" Classes="base" />
+			<Button IsEnabled="{Binding Connection}"   x:Name="ButtonRegister" Content="Register" Command="{Binding RegUserCommand}" Classes="base" />
 			<TextBlock IsVisible="{Binding !Connection}" Classes="base" >Sorry,the server is disabled!</TextBlock>
-			<TextBlock IsVisible="{Binding ResponseReceived}" Classes="error" Text="{Binding ResponseInfo} Col" ></TextBlock>
+			<TextBlock IsVisible="{Binding ResponseReceived}" Classes="error" Text="{Binding ResponseInfo}" ></TextBlock>
 
 
 			<!--

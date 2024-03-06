@@ -55,10 +55,11 @@ public partial class RegWindow : Window
     {
         if (!string.IsNullOrEmpty(PasswordBox.Text) && PasswordBox.Text == ConfirmPasswordBox.Text)
         {
-            ValidationTextBlock.Text = ""; // Пароли совпадают
+            ValidationTextBlock.IsVisible = false; // Пароли совпадают
         }
         else
         {
+            ValidationTextBlock.IsVisible = true;
             ValidationTextBlock.Text = "Пароли не совпадают!";
         }
     }

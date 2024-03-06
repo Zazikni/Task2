@@ -28,8 +28,8 @@
 				<TextBox Name="TextBoxLogin" Classes="base" Watermark="Enter your login" Text="{Binding Path=Login}"/>
 				<TextBlock Text="Password" Classes="base" />
 				<TextBox Name="TextBoxPassword" Classes="base" PasswordChar="*" Watermark="Enter your password" Text="{Binding Path=Password}"/>
-				<Button IsEnabled="{Binding Connection}"  Name="ButtonLogIn" Content="Log" Click="button_ButtonLogIn_Click" Command="{Binding AuthUserCommand}" Classes="base" />
-				<Button IsEnabled="{Binding Connection}"  Name="ButtonRegister" Content="Reg" Command="{Binding OpenRegisterWindowCommand}" Classes="base" />
+				<Button IsEnabled="{Binding Connection}"  Name="ButtonLogIn" Content="Log in" Click="button_ButtonLogIn_Click" Command="{Binding AuthUserCommand}" Classes="base" />
+				<Button IsEnabled="{Binding Connection}"  Name="ButtonRegister" Content="Register" Command="{Binding OpenRegisterWindowCommand}" Classes="base" />
 				<TextBlock IsVisible="{Binding !Connection}" Classes="base" >Sorry,the server is disabled!</TextBlock>
 
 
