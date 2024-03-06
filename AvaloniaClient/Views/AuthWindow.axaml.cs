@@ -1,6 +1,5 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Serilog;
 
 namespace AvaloniaClient.Views
 {
@@ -10,9 +9,9 @@ namespace AvaloniaClient.Views
         {
             InitializeComponent(attachDevTools: true);
         }
+
         public void button_ButtonLogIn_Click(object sender, RoutedEventArgs e)
         {
-            
             // Change button text when button is clicked.
             //var button = (Button)sender;
             //Getting Controls references

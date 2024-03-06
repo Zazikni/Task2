@@ -1,8 +1,5 @@
 ﻿using Serilog;
 using Serilog.Events;
-using System.Configuration;
-using System;
-
 
 namespace AvaloniaClient.Models.Logging
 {/// <summary>
@@ -12,7 +9,7 @@ namespace AvaloniaClient.Models.Logging
     {
         public LoggerInit()
         {
-            int logFileSize = Convert.ToInt32(ConfigurationManager.AppSettings["logMaxSizeInBytes"]);
+            int logFileSize = 20000;
             Log.Logger = new LoggerConfiguration()
                         .MinimumLevel.Debug()
                         .WriteTo.File(path: "logs/debug-.log", restrictedToMinimumLevel: LogEventLevel.Debug, rollingInterval: RollingInterval.Day, rollOnFileSizeLimit: true, fileSizeLimitBytes: logFileSize)

@@ -1,8 +1,8 @@
-﻿using AvaloniaClient.Models.AnswerManager;
+﻿using AvaloniaClient.Configuration;
+using AvaloniaClient.Models.AnswerManager;
 using Serilog;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Sockets;
@@ -13,8 +13,10 @@ namespace AvaloniaClient.Models.Backend
 {
     internal class ConnectionService
     {
-        #region fields
+        #region Fields
+
         private static ConnectionService? _instance = null;
+
         public static ConnectionService Instance
         {
             get
@@ -26,17 +28,28 @@ namespace AvaloniaClient.Models.Backend
                 return _instance;
             }
         }
-        private string _host = ConfigurationManager.AppSettings["ServerHost"];
-        public string Host { get { return _host; } }
-        private int _port = Convert.ToInt32(ConfigurationManager.AppSettings["ServerPort"]);
-        private int _sendDelayIfNoConnection = Convert.ToInt32(ConfigurationManager.AppSettings["SendingDelayIfNoConnection"]);
-        private int _reciveDelayIfNoConnection = Convert.ToInt32(ConfigurationManager.AppSettings["ReadingDelayIfNoConnection"]);
-        private int _monitoringDelay = Convert.ToInt32(ConfigurationManager.AppSettings["MonitoringDelay"]);
-        //private int _answerTimeout = Convert.ToInt32(ConfigurationManager.AppSettings["MonitoringDelay"]);
-        private int _responseIterationDelay = Convert.ToInt32(ConfigurationManager.AppSettings["ResponseIterationDelay"]);
-        public int Port { get { return _port; } }
+
+        private string _host = ConfigurationManager.Instance.RootSettings.ConnectionService.Server.ServerHost;
+
+        public string Host
+        { get { return _host; } }
+
+        private int _port = ConfigurationManager.Instance.RootSettings.ConnectionService.Server.ServerPort;
+
+        private int _sendDelayIfNoConnection = ConfigurationManager.Instance.RootSettings.ConnectionService.SendDelayIfNoConnection;
+        private int _reciveDelayIfNoConnection = ConfigurationManager.Instance.RootSettings.ConnectionService.RecieveDelayIfNoConnection;
+        private int _monitoringDelay = ConfigurationManager.Instance.RootSettings.ConnectionService.MonitoringDelay;
+
+        private int _responseIterationDelay = ConfigurationManager.Instance.RootSettings.ConnectionService.ResponseIterationDelay;
+
+        public int Port
+        { get { return _port; } }
+
         private TcpClient _tcpClient;
-        public TcpClient Client { get { return _tcpClient; } }
+
+        public TcpClient Client
+        { get { return _tcpClient; } }
+
         private StreamReader? Reader = null;
         private StreamWriter? Writer = null;
         private List<ServerRequest> requests = new List<ServerRequest>();
@@ -44,26 +57,28 @@ namespace AvaloniaClient.Models.Backend
         private Thread monitoringThread;
         private bool monitoringIsRunning = true;
 
+        #endregion Fields
 
-        #endregion
+        #region Delegate
 
-        #region delegate
         public delegate void WhenConnectionStatusChangeDelegate();
+
         private WhenConnectionStatusChangeDelegate _delegateChain;
 
+        #endregion Delegate
 
-        #endregion
+        #region Constructor
 
-        #region constructor
         private ConnectionService()
         {
             _tcpClient = new TcpClient();
-            _delegateChain  += SimpleCallbackWhenConnectionResumed;
-
+            _delegateChain += SimpleCallbackWhenConnectionResumed;
         }
-        #endregion
 
-        #region methods
+        #endregion Constructor
+
+        #region Methods
+
         // Метод для добавления обработчиков к делегату.
         public void AddCallback(WhenConnectionStatusChangeDelegate del)
         {
@@ -75,15 +90,16 @@ namespace AvaloniaClient.Models.Backend
         {
             _delegateChain -= del;
         }
+
         // Метод, вызывающий делегат.
         private void ExecuteCallback()
         {
             // Вызываем делегат.
             _delegateChain?.Invoke();
         }
+
         public void Start()
         {
-
             Connect();
             // запускаем новый поток для мониторинга соеденения
             monitoringThread = new Thread(MonitorConnection) { IsBackground = true };
@@ -93,8 +109,8 @@ namespace AvaloniaClient.Models.Backend
             Task.Run(() => ReceiveMessageAsync());
             // запускаем новый поток для получения данных
             Task.Run(() => SendMessageAsync());
-
         }
+
         public void Stop()
         {
             monitoringIsRunning = false;
@@ -102,6 +118,7 @@ namespace AvaloniaClient.Models.Backend
             monitoringThread.Join();
             Log.Information("Соеденение закрыто.");
         }
+
         private void MonitorConnection()
 
         {
@@ -109,7 +126,6 @@ namespace AvaloniaClient.Models.Backend
 
             while (monitoringIsRunning)
             {
-
                 if (!Client.Connected) //TODO тут следовало бы сделать какую нибудь более надежную логику проверки соеденения. Но то что есть - тоже будет работать.
                 {
                     ExecuteCallback();
@@ -117,10 +133,10 @@ namespace AvaloniaClient.Models.Backend
                     Connect(); // Попытка переподключения
                 }
 
-
                 Thread.Sleep(_monitoringDelay);
             }
         }
+
         private void Connect()
         {
             int attempt = 1;
@@ -137,33 +153,27 @@ namespace AvaloniaClient.Models.Backend
                     Log.Information($"Соеденение с сервером {Host}:{Port} - установлено. Успешная попытка: {attempt}.");
                     ExecuteCallback();
 
-
-
                     break;
-
                 }
                 catch (SocketException ex)
                 {
                     Log.Debug($"Ошибка подключения {Host}:{Port} {ex.Message}");
                     attempt++;
-
                 }
-
-
             }
-
         }
+
         private void CloseConnection()
         {
             Client.Dispose();
             if (Reader != null) { Reader.Dispose(); }
             if (Writer != null) { Writer.Dispose(); }
         }
+
         // получение сообщений
         private async Task ReceiveMessageAsync()
         {
             Log.Information($"Запущен процесс получения сообщений с сервера {Host}:{Port}");
-
 
             while (true)
             {
@@ -179,32 +189,27 @@ namespace AvaloniaClient.Models.Backend
                         if (string.IsNullOrEmpty(message)) continue;
                         try
                         {
-                            ServerResponse response =  await AnswerManager.AnswerManager.GetResponse(message);
+                            ServerResponse response = await AnswerManager.AnswerManager.GetResponse(message);
                             responses.Add(response);
                         }
-                        catch 
+                        catch
                         {
                             continue;
                         }
-
-
-
                     }
-
                     catch (Exception ex)
                     {
                         Log.Information($"Ошибка соеденения {Host}:{Port} {ex.Message}");
                         continue;
                     }
-
                 }
                 else
                 {
                     await Task.Delay(_reciveDelayIfNoConnection);
                 }
-
             }
         }
+
         public async Task SendMessageAsync()
         {
             Log.Information($"Запущен процесс отправки сообщений на сервер {Host}:{Port}");
@@ -229,24 +234,24 @@ namespace AvaloniaClient.Models.Backend
                     }
 
                     requests.Remove(request);
-
-
                 }
                 else
                 {
                     await Task.Delay(_sendDelayIfNoConnection);
                 }
             }
-
         }
+
         private void SimpleCallbackWhenConnectionResumed()
         {
             Log.Debug("Статус соеденения изменился - обработка события делегатом.");
         }
+
         public void AddRequest(ServerRequest request)
         {
             requests.Add(request);
         }
+
         public async Task<ServerResponse> GetResponseAsync(int response_id, TimeSpan timeout)
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
@@ -260,21 +265,16 @@ namespace AvaloniaClient.Models.Backend
                         responses.Remove(response);
                         return response;
                     }
-
                 }
                 if (stopwatch.Elapsed > timeout)
                 {
                     stopwatch.Stop();
                     throw new TimeoutException($"Ожидание ответа привысило {timeout.TotalSeconds} секунд.");
-
                 }
                 await Task.Delay(_responseIterationDelay);
-
             }
-
-
         }
-        #endregion
 
+        #endregion Methods
     }
 }

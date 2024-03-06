@@ -1,18 +1,18 @@
-﻿using AvaloniaClient.Models.Backend;
+﻿using AvaloniaClient.Models.AnswerManager;
+using AvaloniaClient.Models.Backend;
+using AvaloniaClient.Models.WindowManager;
 using ReactiveUI;
 using Serilog;
+using System;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using AvaloniaClient.Models.WindowManager;
-using System;
-using AvaloniaClient.Models.AnswerManager;
-
 
 namespace AvaloniaClient.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {
         #region fields
+
         private string _message = "Wait a bit...";
 
         public string Message
@@ -20,28 +20,31 @@ namespace AvaloniaClient.ViewModels
             get => _message;
             set => this.RaiseAndSetIfChanged(ref _message, value);
         }
-        #endregion
+
+        #endregion fields
 
         #region constructors
+
         public MainWindowViewModel()
         {
             Log.Debug($"MainWindowViewModel init");
 
             GetDataFromServerAsync();
-
         }
-        #endregion
+
+        #endregion constructors
 
         #region tasks
+
         private async Task GetDataFromServerAsync()
         {
             Log.Information($"GetDataFromServerAsync start");
 
-            ServerRequest request = new ServerRequest(command:"-spam");
+            ServerRequest request = new ServerRequest(command: "-spam");
             ConnectionService.Instance.AddRequest(request);
             ServerResponse comm_response = await ConnectionService.Instance.GetResponseAsync(response_id: request.Id, timeout: TimeSpan.FromSeconds(2));
 
-            while ( true )
+            while (true)
             {
                 try
                 {
@@ -53,26 +56,17 @@ namespace AvaloniaClient.ViewModels
                     );
 
                     Message += "\n" + result;
-                    
-
                 }
-                catch( SocketException ex)
+                catch (SocketException ex)
                 {
                     Log.Error($"GetDataAsync {ex.Message}");
                     WindowManager.SwitchToAuthWindow();
                     break;
                 }
-
-
             }
             Log.Information($"GetDataFromServerAsync end");
-
-
-
         }
 
-        #endregion
-
+        #endregion tasks
     }
-
 }

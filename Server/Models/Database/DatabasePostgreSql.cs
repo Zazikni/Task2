@@ -13,7 +13,7 @@ namespace Models.Database
     /// </summary>
     internal class DatabasePostgreSql : IDatabase
     {
-        #region fields
+        #region Fields
 
         private string _connectionString;
         private NpgsqlDataSource _dataSource;
@@ -31,9 +31,9 @@ namespace Models.Database
             }
         }
 
-        #endregion fields
+        #endregion Fields
 
-        #region constructors
+        #region Constructors
 
         private DatabasePostgreSql()
 
@@ -52,9 +52,9 @@ namespace Models.Database
             _CheckConnection();
         }
 
-        #endregion constructors
+        #endregion Constructors
 
-        #region methods
+        #region Methods
 
         private async Task _init()
         {
@@ -151,7 +151,7 @@ namespace Models.Database
                     string db_password = (string)reader.GetValue(2);
                     Int64 db_id = Convert.ToInt64(reader.GetValue(3));
 
-                    Log.Debug($"{db_login} \t {db_name} \t {db_password} \t {db_id}");
+                    Log.Debug($"information from database{db_login} \t {db_name} \t {db_password} \t {db_id}");
                     return new User(name: db_name, login: db_login, password: db_password, id: db_id);
                 }
                 else
@@ -174,6 +174,6 @@ namespace Models.Database
             return null;
         }
 
-        #endregion methods
+        #endregion Methods
     }
 }

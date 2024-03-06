@@ -3,7 +3,7 @@
  > [Logging](./Models/Logging/LoggerInit.cs)
  ***
 #### Путь к конфигурации
- > [Config](App.config)
+ > [Config](./Configuration/Settings.cs)
  ***
 #### Короткое описание и сколько этапов готово
 ##### Задание для клиента

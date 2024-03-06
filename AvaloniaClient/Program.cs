@@ -1,9 +1,10 @@
 ﻿using Avalonia;
 using Avalonia.ReactiveUI;
+using AvaloniaClient.Configuration;
 using AvaloniaClient.Models.Backend;
 using AvaloniaClient.Models.Logging;
-using System;
 using Serilog;
+using System;
 using System.Threading.Tasks;
 
 namespace AvaloniaClient
@@ -17,14 +18,14 @@ namespace AvaloniaClient
         public static void Main(string[] args)
         {
             new LoggerInit();
+            RootSettings Settings = ConfigurationManager.Instance.RootSettings;
 
             Log.Debug("Запуск сетевого сервиса.");
             Task.Run(() => ConnectionService.Instance.Start());
-            
+
             Log.Debug("Запуск приложения.");
             BuildAvaloniaApp()
             .StartWithClassicDesktopLifetime(args);
-            
         }
 
         // Avalonia configuration, don't remove; also used by visual designer.

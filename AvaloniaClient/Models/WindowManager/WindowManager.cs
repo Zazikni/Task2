@@ -6,17 +6,19 @@ using Serilog;
 
 namespace AvaloniaClient.Models.WindowManager
 {
-    
     /// <summary>
     /// Класс для управления окнами.
     /// </summary>
     public static class WindowManager
     {
         #region fields
+
         private static Window? _reg_window = null;
-        #endregion
+
+        #endregion fields
 
         #region methods
+
         /// <summary>
         /// Метод для открытия окна регистрации.
         /// </summary>
@@ -30,16 +32,16 @@ namespace AvaloniaClient.Models.WindowManager
                 _reg_window.DataContext = new RegWindowViewModel();
                 _reg_window.Show();
             }
-     
         }
+
         /// <summary>
         /// Метод для сброса состояния окна регистрации.
         /// </summary>
         public static void DropRegWindow()
         {
-
             _reg_window = null;
         }
+
         /// <summary>
         /// Метод для закрытия окна регистрации.
         /// </summary>
@@ -51,8 +53,8 @@ namespace AvaloniaClient.Models.WindowManager
             {
                 _reg_window.Close(_reg_window.DataContext);
             }
-
         }
+
         /// <summary>
         /// Метод для закрытия текущего главного окна и переключения на главное (логически) окно программы.
         /// </summary>
@@ -70,9 +72,8 @@ namespace AvaloniaClient.Models.WindowManager
                 desktopLifetime.MainWindow = newWindow;
                 currentMainWindow.Close();
             }
-
-
         }
+
         public static void SwitchToAuthWindow()
         {
             Log.Information($"Switch to auth window");
@@ -87,11 +88,8 @@ namespace AvaloniaClient.Models.WindowManager
                 desktopLifetime.MainWindow = newWindow;
                 currentMainWindow.Close();
             }
-
         }
-        #endregion
 
+        #endregion methods
     }
-    
-
 }
