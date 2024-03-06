@@ -23,7 +23,7 @@ namespace AvaloniaClient.Models.AnswerManager
     /// </summary>
     internal static class AnswerManager
     {
-        #region methods
+        #region Methods
 
         /// <summary>
         /// Обрабатывает ответ сервера содержащий ответ на попытку аутентификации.
@@ -58,6 +58,6 @@ namespace AvaloniaClient.Models.AnswerManager
             }
         }
 
-        #endregion methods
+        #endregion Methods
     }
 }

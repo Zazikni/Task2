@@ -10,7 +10,7 @@ namespace AvaloniaClient.ViewModels
 {
     public class AuthWindowViewModel : ViewModelBase
     {
-        #region fields
+        #region Fields
 
         //private Server _server = Server.Instance;
         private bool _connection;
@@ -37,49 +37,51 @@ namespace AvaloniaClient.ViewModels
             set { this.RaiseAndSetIfChanged(ref _password, value); }
         }
 
-        #endregion fields
+        #endregion Fields
 
-        #region commands
+        #region Commands
 
         public ReactiveCommand<Unit, Unit> AuthUserCommand { get; }
         public ReactiveCommand<Unit, Unit> OpenRegisterWindowCommand { get; }
 
-        #endregion commands
+        #endregion Commands
 
-        #region constructors
+        #region Constructors
 
         public AuthWindowViewModel()
         {
+            Log.Debug($"Создание окна аутентификации.");
+
             _connection = ConnectionService.Instance.Client.Connected;
             ConnectionService.Instance.AddCallback(RefreshConnectionStatus);
             OpenRegisterWindowCommand = ReactiveCommand.Create(OpenRegisterWindow);
             AuthUserCommand = ReactiveCommand.Create(AuthUserByLogPass);
         }
 
-        #endregion constructors
+        #endregion Constructors
 
-        #region commMethods
+        #region CommMethods
 
         public async void OpenRegisterWindow()
         {
-            Log.Debug($"Button with OpenRegisterWindowCommand was clicked!");
+            Log.Debug($"Окно аутентификации. Кнопка открытия окна регистрации нажата.");
             WindowManager.ShowRegWindow();
         }
 
         public async void AuthUserByLogPass()
         {
-            Log.Debug($"Button from AuthWindow with AuthUserCommand was clicked!");
-            Log.Debug($"TextBoxLogin: {Login}\tTextBoxPassword:{Password}");
+            Log.Debug($"Окно аутентификации. Кнопка аутентификации нажата.");
+            Log.Debug($"Окно аутентификации. TextBoxLogin: {Login}\tTextBoxPassword:{Password}");
             ServerResponse response;
             ServerRequest request;
             if (String.IsNullOrEmpty(Login) || String.IsNullOrEmpty(Password))
             {
-                Log.Information($"Incorrect data.");
+                Log.Information($"Окно аутентификации. Неверне данные.");
                 return;
             }
             if (String.IsNullOrWhiteSpace(Login) || String.IsNullOrWhiteSpace(Password))
             {
-                Log.Information($"Incorrect data.");
+                Log.Information($"Окно аутентификации. Неверне данные.");
                 return;
             }
             request = new ServerRequest(command: "-auth", message: $"{Login}@{Password}");
@@ -90,7 +92,7 @@ namespace AvaloniaClient.ViewModels
             }
             catch (TimeoutException ex)
             {
-                Log.Information($"Запрос {request.Id} TimeoutException");
+                Log.Information($"Окно аутентификации. Запрос {request.Id} TimeoutException");
                 return;
             }
 
@@ -104,16 +106,16 @@ namespace AvaloniaClient.ViewModels
             }
         }
 
-        #endregion commMethods
+        #endregion CommMethods
 
-        #region methods
+        #region Methods
 
         public async void RefreshConnectionStatus()
         {
-            Log.Debug($"RefreshConnectionStatus ConnectionService.Instance.Client.Connected - {ConnectionService.Instance.Client.Connected}");
+            Log.Debug($"Окно аутентификации. Обновление статуса соеденения. Соеденение - {(ConnectionService.Instance.Client.Connected ? "Установлено" : "Потеряно")}");
             Connection = ConnectionService.Instance.Client.Connected;
         }
 
-        #endregion methods
+        #endregion Methods
     }
 }

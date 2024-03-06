@@ -15,21 +15,26 @@
 
     internal class ServerResponse : IServerMessage
     {
-        #region fields
+        #region Fields
 
         private StatusCodes _status;
+
         public StatusCodes StatusCode
         { get { return _status; } }
+
         private string _message;
+
         public string Message
         { get { return _message; } }
+
         private int _id;
+
         public int Id
         { get { return _id; } }
 
-        #endregion fields
+        #endregion Fields
 
-        #region constructors
+        #region Constructors
 
         public ServerResponse(int status_code, string message, int id)
         {
@@ -38,6 +43,6 @@
             _id = id;
         }
 
-        #endregion constructors
+        #endregion Constructors
     }
 }

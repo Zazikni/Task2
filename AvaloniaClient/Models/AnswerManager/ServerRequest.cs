@@ -4,15 +4,26 @@ namespace AvaloniaClient.Models.AnswerManager
 {
     internal class ServerRequest : IServerMessage
     {
+        #region Fields
+
         private string _message;
+
         public string Message
         { get { return _message; } }
+
         private int _id;
+
         public int Id
         { get { return _id; } }
+
         private string _command;
+
         public string Command
         { get { return _command; } }
+
+        #endregion Fields
+
+        #region Methods
 
         public ServerRequest(string command, string message)
         {
@@ -33,5 +44,7 @@ namespace AvaloniaClient.Models.AnswerManager
         {
             return $"{Id}@{Command}{(!System.String.IsNullOrEmpty(_message) ? "@" : "")}{(!System.String.IsNullOrEmpty(_message) ? Message : "")}";
         }
+
+        #endregion Methods
     }
 }

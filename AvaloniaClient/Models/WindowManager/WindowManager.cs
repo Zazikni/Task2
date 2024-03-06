@@ -11,20 +11,20 @@ namespace AvaloniaClient.Models.WindowManager
     /// </summary>
     public static class WindowManager
     {
-        #region fields
+        #region Fields
 
         private static Window? _reg_window = null;
 
-        #endregion fields
+        #endregion Fields
 
-        #region methods
+        #region Methods
 
         /// <summary>
         /// Метод для открытия окна регистрации.
         /// </summary>
         public static void ShowRegWindow()
         {
-            Log.Information($"Open registration window.");
+            Log.Information($"Открытие окна регистрации.");
 
             if (_reg_window == null)
             {
@@ -47,7 +47,7 @@ namespace AvaloniaClient.Models.WindowManager
         /// </summary>
         public static void CloseRegWindow()
         {
-            Log.Information($"Close registration window.");
+            Log.Information($"Закрытие окна регистрации.");
 
             if (_reg_window != null)
             {
@@ -60,7 +60,7 @@ namespace AvaloniaClient.Models.WindowManager
         /// </summary>
         public static void SwitchToMainWindow()
         {
-            Log.Information($"Switch to main window");
+            Log.Information($"Переключение на главное окно.");
             if (App.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopLifetime)
             {
                 var currentMainWindow = desktopLifetime.MainWindow;
@@ -76,7 +76,7 @@ namespace AvaloniaClient.Models.WindowManager
 
         public static void SwitchToAuthWindow()
         {
-            Log.Information($"Switch to auth window");
+            Log.Information($"Переключение на окно аутентификации.");
             if (App.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopLifetime)
             {
                 var currentMainWindow = desktopLifetime.MainWindow;
@@ -90,6 +90,6 @@ namespace AvaloniaClient.Models.WindowManager
             }
         }
 
-        #endregion methods
+        #endregion Methods
     }
 }

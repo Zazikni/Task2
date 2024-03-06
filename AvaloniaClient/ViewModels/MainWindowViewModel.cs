@@ -11,7 +11,7 @@ namespace AvaloniaClient.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {
-        #region fields
+        #region Fields
 
         private string _message = "Wait a bit...";
 
@@ -21,24 +21,24 @@ namespace AvaloniaClient.ViewModels
             set => this.RaiseAndSetIfChanged(ref _message, value);
         }
 
-        #endregion fields
+        #endregion Fields
 
-        #region constructors
+        #region Constructors
 
         public MainWindowViewModel()
         {
-            Log.Debug($"MainWindowViewModel init");
+            Log.Debug($"Создание главного окна.");
 
             GetDataFromServerAsync();
         }
 
-        #endregion constructors
+        #endregion Constructors
 
-        #region tasks
+        #region Tasks
 
         private async Task GetDataFromServerAsync()
         {
-            Log.Information($"GetDataFromServerAsync start");
+            Log.Information($"Получение сообщений из рассылки сервера - запущено.");
 
             ServerRequest request = new ServerRequest(command: "-spam");
             ConnectionService.Instance.AddRequest(request);
@@ -59,14 +59,14 @@ namespace AvaloniaClient.ViewModels
                 }
                 catch (SocketException ex)
                 {
-                    Log.Error($"GetDataAsync {ex.Message}");
+                    Log.Error($"GetDataFromServerAsync {ex.Message}");
                     WindowManager.SwitchToAuthWindow();
                     break;
                 }
             }
-            Log.Information($"GetDataFromServerAsync end");
+            Log.Information($"Получение сообщений из рассылки сервера - закончено.");
         }
 
-        #endregion tasks
+        #endregion Tasks
     }
 }

@@ -10,7 +10,7 @@ namespace AvaloniaClient.ViewModels
 {
     public class RegWindowViewModel : ViewModelBase
     {
-        #region fields
+        #region Fields
 
         private string _name;
         private string _login;
@@ -55,44 +55,46 @@ namespace AvaloniaClient.ViewModels
             set => this.RaiseAndSetIfChanged(ref _response_received, value);
         }
 
-        #endregion fields
+        #endregion Fields
 
-        #region commands
+        #region Commands
 
         public ReactiveCommand<Unit, Unit> RegUserCommand { get; }
 
-        #endregion commands
+        #endregion Commands
 
-        #region constructors
+        #region Constructors
 
         public RegWindowViewModel()
         {
+            Log.Debug($"Создание окна регистрации.");
+
             _connection = ConnectionService.Instance.Client.Connected;
 
             ConnectionService.Instance.AddCallback(RefreshConnectionStatus);
             RegUserCommand = ReactiveCommand.Create(RegUser);
         }
 
-        #endregion constructors
+        #endregion Constructors
 
-        #region commMethods
+        #region CommMethods
 
         public async void RegUser()
         {
-            Log.Debug($"Button from RegWindow with RegUserCommand was clicked!");
-            Log.Debug($"TextBoxLogin: {Name}\tTextBoxLogin: {Login}\tTextBoxPassword:{Password}");
+            Log.Debug($"Окно регистрации. Кнопка регистрации нажата.");
+            Log.Debug($"Окно регистрации. TextBoxLogin: {Name}\tTextBoxLogin: {Login}\tTextBoxPassword:{Password}");
 
             ServerResponse response;
             ServerRequest request;
 
             if (String.IsNullOrEmpty(Name) || String.IsNullOrEmpty(Login) || String.IsNullOrEmpty(Password))
             {
-                Log.Information($"Incorrect data.");
+                Log.Information($"Окно регистрации. Неверне данные.");
                 return;
             }
             if (String.IsNullOrWhiteSpace(Name) || String.IsNullOrWhiteSpace(Login) || String.IsNullOrWhiteSpace(Password))
             {
-                Log.Information($"Incorrect data.");
+                Log.Information($"Окно регистрации. Неверне данные.");
                 return;
             }
             request = new ServerRequest(command: "-reg", message: $"{Name}@{Login}@{Password}");
@@ -103,7 +105,7 @@ namespace AvaloniaClient.ViewModels
             }
             catch (TimeoutException ex)
             {
-                Log.Information($"Запрос {request.Id} TimeoutException");
+                Log.Information($"Окно регистрации. Запрос {request.Id} TimeoutException");
                 return;
             }
 
@@ -120,16 +122,16 @@ namespace AvaloniaClient.ViewModels
             }
         }
 
-        #endregion commMethods
+        #endregion CommMethods
 
-        #region methods
+        #region Methods
 
         public async void RefreshConnectionStatus()
         {
-            Log.Debug($"RefreshConnectionStatus ConnectionService.Instance.Client.Connected - {ConnectionService.Instance.Client.Connected}");
+            Log.Debug($"Окно регистрации. Обновление статуса соеденения. Соеденение - {(ConnectionService.Instance.Client.Connected?"Установлено":"Потеряно")}");
             Connection = ConnectionService.Instance.Client.Connected;
         }
 
-        #endregion methods
+        #endregion Methods
     }
 }
