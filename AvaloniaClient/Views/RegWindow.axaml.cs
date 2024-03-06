@@ -16,12 +16,10 @@ public partial class RegWindow : Window
     public RegWindow()
     {
         InitializeComponent();
-        //PasswordBox = this.FindControl<TextBox>("PasswordBox");
-        //ConfirmPasswordBox = this.FindControl<TextBox>("ConfirmPasswordBox");
-        //ValidationTextBlock = this.FindControl<TextBlock>("ValidationTextBlock");
+
         // Подписываемся на событие изменения текста
-        PasswordBox.PropertyChanged += PasswordBox_PropertyChanged;
-        ConfirmPasswordBox.PropertyChanged += ConfirmPasswordBox_PropertyChanged;
+        TextBoxPassword.PropertyChanged += PasswordBox_PropertyChanged;
+        TextBoxConfirmPassword.PropertyChanged += ConfirmPasswordBox_PropertyChanged;
 
         this.Closing += OnClosing;
     }
@@ -53,7 +51,7 @@ public partial class RegWindow : Window
     }
     private void ValidatePasswords()
     {
-        if (!string.IsNullOrEmpty(PasswordBox.Text) && PasswordBox.Text == ConfirmPasswordBox.Text)
+        if (!string.IsNullOrEmpty(TextBoxPassword.Text) && TextBoxPassword.Text == TextBoxConfirmPassword.Text)
         {
             ValidationTextBlock.IsVisible = false; // Пароли совпадают
         }

@@ -33,10 +33,10 @@
 			<TextBox Name="TextBoxLogin" Classes="base" Watermark="Enter your login" Text="{Binding Path=Login}"/>
 			
 			<TextBlock Text="Password" Classes="base" />
-			<TextBox Name="PasswordBox" Classes="base" Watermark="Enter your password" Text="{Binding Path=Password}"/>
+			<TextBox Name="TextBoxPassword" Classes="base" Watermark="Enter your password" Text="{Binding Path=Password}"/>
 			
 			<TextBlock Text="Confirm Password" Classes="base" />
-			<TextBox Name="ConfirmPasswordBox" Classes="base" Watermark="Enter your password"/>
+			<TextBox Name="TextBoxConfirmPassword" Classes="base" Watermark="Enter your password"/>
 			
 			<TextBlock Name="ValidationTextBlock" Foreground="Red" IsVisible="False" Classes="base"/>
 			
