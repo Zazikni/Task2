@@ -41,7 +41,7 @@
 			<TextBlock Name="ValidationTextBlock" Foreground="Red" IsVisible="False" Classes="base"/>
 			
 			<Button IsEnabled="{Binding Connection}"   x:Name="ButtonRegister" Content="Register" Command="{Binding RegUserCommand}" Classes="base" />
-			<TextBlock IsVisible="{Binding !Connection}" Classes="base" >Sorry,the server is disabled!</TextBlock>
+			<TextBlock IsVisible="{Binding !Connection}" Classes="error" >Sorry,the server is disabled!</TextBlock>
 			<TextBlock IsVisible="{Binding ResponseReceived}" Classes="error" Text="{Binding ResponseInfo}" ></TextBlock>
 
 
