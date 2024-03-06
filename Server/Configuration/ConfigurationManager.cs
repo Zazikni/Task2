@@ -31,6 +31,8 @@ namespace Server.Configuration
 
         private ConfigurationManager()
         {
+            Log.Information("Загрузка конфигурации.");
+
             var configurationBuilder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile(_FullPath, optional: true, reloadOnChange: true);

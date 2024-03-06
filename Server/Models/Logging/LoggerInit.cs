@@ -1,6 +1,8 @@
 ﻿using Serilog;
 using Serilog.Events;
+using Server.Configuration;
 using System.Configuration;
+using ConfigurationManager = Server.Configuration.ConfigurationManager;
 
 namespace Models.Logging
 {/// <summary>
@@ -10,7 +12,7 @@ namespace Models.Logging
     {
         public LoggerInit()
         {
-            int logFileSize = Convert.ToInt32(ConfigurationManager.AppSettings["logMaxSizeInBytes"]);
+            int logFileSize = 20000;
             Log.Logger = new LoggerConfiguration()
                         .MinimumLevel.Debug()
                         .WriteTo.File(path: "logs/debug-.log", restrictedToMinimumLevel: LogEventLevel.Debug, rollingInterval: RollingInterval.Day, rollOnFileSizeLimit: true, fileSizeLimitBytes: logFileSize)

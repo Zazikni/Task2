@@ -41,7 +41,7 @@ namespace Server.Models.Client
         { get { return _client; } }
         private ServerObject server; // объект сервера
 
-        #endregion fields
+        #endregion Fields
 
         #region constructors
 
@@ -57,7 +57,7 @@ namespace Server.Models.Client
             Writer = new StreamWriter(stream);
         }
 
-        #endregion constructors
+        #endregion Constructors
 
         #region methods
 
@@ -219,6 +219,6 @@ namespace Server.Models.Client
             _client.Close();
         }
 
-        #endregion methods
+        #endregion Methods
     }
 }

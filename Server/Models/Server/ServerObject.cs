@@ -1,9 +1,11 @@
 ﻿using Models.Database;
 using Serilog;
+using Server.Configuration;
 using Server.Models.Client;
 using System.Configuration;
 using System.Net;
 using System.Net.Sockets;
+using ConfigurationManager = Server.Configuration.ConfigurationManager;
 
 namespace Server.Models.Server
 {
@@ -18,7 +20,7 @@ namespace Server.Models.Server
         public async void SpamProcessAsync()
         {
             Console.WriteLine("Рассылка - запущена.");
-            int timeout = Convert.ToInt32(ConfigurationManager.AppSettings["SpamTimeout"]);
+            int timeout = ConfigurationManager.Instance.RootSettings.MessageSending.SpamTimeout;
 
             string message = "0000@000@Какая-то история о Незнайке.";
             while (true)

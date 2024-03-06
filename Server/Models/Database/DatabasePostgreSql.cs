@@ -2,7 +2,9 @@
 using Models.Users;
 using Npgsql;
 using Serilog;
+using Server.Configuration;
 using System.Configuration;
+using ConfigurationManager = Server.Configuration.ConfigurationManager;
 
 namespace Models.Database
 {
@@ -39,14 +41,17 @@ namespace Models.Database
 
         {
             NpgsqlConnectionStringBuilder _csb = new NpgsqlConnectionStringBuilder();
-            _csb.Host = ConfigurationManager.AppSettings["PostgreHost"];
-            _csb.Database = ConfigurationManager.AppSettings["PostgreDatabase"];
-            _csb.Username = ConfigurationManager.AppSettings["PostgreUsername"];
-            _csb.Password = ConfigurationManager.AppSettings["PostgrePassword"];
-            _csb.Port = Convert.ToInt32(ConfigurationManager.AppSettings["PostgrePort"]);
+         
+            _csb.Host = ConfigurationManager.Instance.RootSettings.Database.PostgreHost;
+            _csb.Database = ConfigurationManager.Instance.RootSettings.Database.PostgreDatabaseName;
+            _csb.Username = ConfigurationManager.Instance.RootSettings.Database.PostgreUsername;
+            _csb.Password = ConfigurationManager.Instance.RootSettings.Database.PostgrePassword;
+            _csb.Port = ConfigurationManager.Instance.RootSettings.Database.PostgrePort;
+
             _connectionString = _csb.ToString();
             var dataSourceBuilder = new NpgsqlDataSourceBuilder(_connectionString);
             _dataSource = dataSourceBuilder.Build();
+            _CheckConnection();
         }
 
         #endregion constructors
@@ -64,6 +69,32 @@ namespace Models.Database
 
             var w = GetUser("zazik");
             await w;
+        }
+        private void _CheckConnection()
+        {
+            Log.Information("Проверка соеденения с базой данных.");
+            try
+            {
+                using (var connection =  _dataSource.OpenConnection())
+                {
+                    // Проверяем состояние соединения
+                    if (connection.State == System.Data.ConnectionState.Open)
+                    {
+                        Log.Information("Соединение с базой данных успешно установлено.");
+                    }
+                }
+            }
+            catch (NpgsqlException ex)
+            {
+                Log.Error("Ошибка при подключении к базе данных: " + ex.Message);
+                Environment.Exit(1);
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Произошла ошибка: " + ex.Message);
+                Environment.Exit(1);
+
+            }
         }
 
         /// <summary>

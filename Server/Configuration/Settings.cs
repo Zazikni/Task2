@@ -12,7 +12,7 @@
         public string PostgreHost { get; set; } = "localhost";
         public string PostgreDatabaseName { get; set; } = "test_database";
         public string PostgreUsername { get; set; } = "postgres";
-        public int PostgrePassword { get; set; } = 85245613;
+        public string PostgrePassword { get; set; } = "85245613";
         public int PostgrePort { get; set; } = 5432;
     }
 
