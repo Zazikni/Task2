@@ -1,10 +1,10 @@
 ﻿using Models.Database;
 using Models.Security;
-using Server.Models.Server;
-using System.Net.Sockets;
 using Models.Users;
 using Npgsql;
 using Serilog;
+using Server.Models.Server;
+using System.Net.Sockets;
 
 namespace Server.Models.Client
 {
@@ -37,11 +37,13 @@ namespace Server.Models.Client
         protected internal StreamReader Reader { get; }
 
         private TcpClient _client;
+
         public TcpClient Client
         { get { return _client; } }
+
         private ServerObject server; // объект сервера
 
-        #endregion Fields
+        #endregion fields
 
         #region constructors
 
@@ -57,7 +59,7 @@ namespace Server.Models.Client
             Writer = new StreamWriter(stream);
         }
 
-        #endregion Constructors
+        #endregion constructors
 
         #region methods
 
@@ -219,6 +221,6 @@ namespace Server.Models.Client
             _client.Close();
         }
 
-        #endregion Methods
+        #endregion methods
     }
 }

@@ -1,8 +1,6 @@
 ﻿using Models.Database;
 using Serilog;
-using Server.Configuration;
 using Server.Models.Client;
-using System.Configuration;
 using System.Net;
 using System.Net.Sockets;
 using ConfigurationManager = Server.Configuration.ConfigurationManager;
@@ -11,12 +9,17 @@ namespace Server.Models.Server
 {
     internal class ServerObject
     {
+        #region Fields
         private IDatabase _database = DatabasePostgreSql.Instance;
+
         public IDatabase Database
         { get { return _database; } }
+
         private TcpListener tcpListener = new TcpListener(IPAddress.Any, 8888); // сервер для прослушивания
         private List<ClientObject> clients = new List<ClientObject>(); // все подключения
+        #endregion Fields
 
+        #region Methods
         public async void SpamProcessAsync()
         {
             Console.WriteLine("Рассылка - запущена.");
@@ -130,5 +133,6 @@ namespace Server.Models.Server
             }
             tcpListener.Stop(); //остановка сервера
         }
+        #endregion Methods
     }
 }

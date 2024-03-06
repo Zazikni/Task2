@@ -1,11 +1,13 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Serilog;
+
 namespace Server.Configuration
 {
     internal class ConfigurationManager
     {
         #region Fields
+
         private static string _ConfigurationDirPath = "Configuration";
         private static string _JsonConfigurationFilePath = "appsettings.json";
         private static string _FullPath = Path.Combine(_ConfigurationDirPath, _JsonConfigurationFilePath);
@@ -41,11 +43,9 @@ namespace Server.Configuration
 
             RootSettings = _Configuration.Get<RootSettings>() ?? new RootSettings();
 
-
             // Проверяем, существует ли папка
             if (!Directory.Exists(_ConfigurationDirPath))
             {
-                
                 Log.Information("Папка с конфигурацией не найдена.");
                 try
                 {
@@ -58,8 +58,6 @@ namespace Server.Configuration
                     Log.Error($"Ошибка при создании папки с конфигурацией. {ex.ToString}");
                     Environment.Exit(1);
                 }
-
-
             }
             // Проверяем, существует ли файл
             if (!File.Exists(_FullPath))
@@ -76,18 +74,19 @@ namespace Server.Configuration
                     Log.Error($"Ошибка при создании файла с конфигурацией. {ex.ToString}");
                     Environment.Exit(1);
                 }
-
             }
         }
 
         #endregion Constructors
 
         #region Methods
+
         private void SaveJsonConfigChanges()
         {
             var serializedConfig = JsonConvert.SerializeObject(RootSettings, Newtonsoft.Json.Formatting.Indented);
             File.WriteAllText(_FullPath, serializedConfig);
         }
-        #endregion
+
+        #endregion Methods
     }
 }

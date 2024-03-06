@@ -2,8 +2,6 @@
 using Models.Users;
 using Npgsql;
 using Serilog;
-using Server.Configuration;
-using System.Configuration;
 using ConfigurationManager = Server.Configuration.ConfigurationManager;
 
 namespace Models.Database
@@ -41,7 +39,7 @@ namespace Models.Database
 
         {
             NpgsqlConnectionStringBuilder _csb = new NpgsqlConnectionStringBuilder();
-         
+
             _csb.Host = ConfigurationManager.Instance.RootSettings.Database.PostgreHost;
             _csb.Database = ConfigurationManager.Instance.RootSettings.Database.PostgreDatabaseName;
             _csb.Username = ConfigurationManager.Instance.RootSettings.Database.PostgreUsername;
@@ -70,12 +68,13 @@ namespace Models.Database
             var w = GetUser("zazik");
             await w;
         }
+
         private void _CheckConnection()
         {
             Log.Information("Проверка соеденения с базой данных.");
             try
             {
-                using (var connection =  _dataSource.OpenConnection())
+                using (var connection = _dataSource.OpenConnection())
                 {
                     // Проверяем состояние соединения
                     if (connection.State == System.Data.ConnectionState.Open)
@@ -93,7 +92,6 @@ namespace Models.Database
             {
                 Log.Error("Произошла ошибка: " + ex.Message);
                 Environment.Exit(1);
-
             }
         }
 

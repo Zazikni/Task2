@@ -20,9 +20,9 @@
     {
         public int SpamTimeout { get; set; } = 5000;
     }
+
     public class LoggingSettings
     {
         public int LogMaxSizeInBytes { get; set; } = 20000;
     }
 }
-    

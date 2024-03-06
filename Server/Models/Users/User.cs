@@ -5,6 +5,7 @@
         #region fields
 
         private Int64 _id;
+
         private Int64 Id
         { get { return _id; } }
 

@@ -7,6 +7,7 @@
         private string _name;
         private string _password;
         private string _login;
+
         public string Name
         { get { return _login; } }
 
