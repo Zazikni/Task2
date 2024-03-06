@@ -3,14 +3,14 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:vm="using:AvaloniaClient.ViewModels"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d" d:DesignWidth="250" d:DesignHeight="350"
 		x:DataType="vm:RegWindowViewModel"
         x:Class="AvaloniaClient.RegWindow"
         Title="RegWindow"
 		WindowStartupLocation="CenterScreen"
 		CanResize="False"
 		Width="250"
-		Height="250"
+		Height="350"
 		
 		
 		>
@@ -28,11 +28,19 @@
 
 			<TextBlock Text="Name" Classes="base" />
 			<TextBox Name="TextBoxName" Classes="base" Watermark="Enter your Name" Text="{Binding Path=Name}"/>
+			
 			<TextBlock Text="Login" Classes="base" />
 			<TextBox Name="TextBoxLogin" Classes="base" Watermark="Enter your login" Text="{Binding Path=Login}"/>
+			
 			<TextBlock Text="Password" Classes="base" />
-			<TextBox Name="TextBoxPassword" Classes="base" Watermark="Enter your password" Text="{Binding Path=Password}"/>
-			<Button IsEnabled="{Binding Connection}"   Name="ButtonRegister" Content="Reg" Command="{Binding RegUserCommand}" Classes="base" />
+			<TextBox Name="PasswordBox" Classes="base" Watermark="Enter your password" Text="{Binding Path=Password}"/>
+			
+			<TextBlock Text="Confirm Password" Classes="base" />
+			<TextBox Name="ConfirmPasswordBox" Classes="base" Watermark="Enter your password" Text="{Binding Path=Password}"/>
+			
+			<TextBlock Name="ValidationTextBlock" Foreground="Red" IsEnabled="False"/>
+			
+			<Button IsEnabled="{Binding Connection}"   x:Name="ButtonRegister" Content="Reg" Command="{Binding RegUserCommand}" Classes="base" />
 			<TextBlock IsVisible="{Binding !Connection}" Classes="base" >Sorry,the server is disabled!</TextBlock>
 			<TextBlock IsVisible="{Binding ResponseReceived}" Classes="error" Text="{Binding ResponseInfo} Col" ></TextBlock>
 
