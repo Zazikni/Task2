@@ -20,6 +20,7 @@ public partial class RegWindow : Window
         // Подписываемся на событие изменения текста
         TextBoxPassword.PropertyChanged += PasswordBox_PropertyChanged;
         TextBoxConfirmPassword.PropertyChanged += ConfirmPasswordBox_PropertyChanged;
+        TextBoxLogin.PropertyChanged += TextBoxLogin_PropertyChanged;
 
         this.Closing += OnClosing;
     }
@@ -49,6 +50,14 @@ public partial class RegWindow : Window
             ValidatePasswords();
         }
     }
+    private void TextBoxLogin_PropertyChanged(object sender, AvaloniaPropertyChangedEventArgs e)
+    {
+        // Проверяем, что изменяемое свойство - это текст
+        if (e.Property == TextBox.TextProperty)
+        {
+            ValidateLogin();
+        }
+    }
     private void ValidatePasswords()
     {
         if (!string.IsNullOrEmpty(TextBoxPassword.Text) && TextBoxPassword.Text == TextBoxConfirmPassword.Text)
@@ -59,6 +68,18 @@ public partial class RegWindow : Window
         {
             ValidationTextBlock.IsVisible = true;
             ValidationTextBlock.Text = "Пароли не совпадают!";
+        }
+    }
+    private void ValidateLogin()
+    {
+        if (!string.IsNullOrEmpty(TextBoxLogin.Text) && !string.IsNullOrWhiteSpace(TextBoxLogin.Text))
+        {
+            ValidationTextBlock.IsVisible = false; 
+        }
+        else
+        {
+            ValidationTextBlock.IsVisible = true;
+            ValidationTextBlock.Text = "Логин не может быть пустым!";
         }
     }
 
