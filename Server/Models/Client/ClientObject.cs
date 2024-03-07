@@ -80,6 +80,8 @@ namespace Server.Models.Client
                         if (message == null) continue;
                         Console.WriteLine($"Получены данные от клиента {Client.Client.RemoteEndPoint}. Данные: {message}");
                         Log.Information($"Получены данные от клиента {Client.Client.RemoteEndPoint}. Данные: {message}");
+
+                        #region Spam
                         if (message.Contains("-spam"))
                         {
                             Log.Debug($"Клиент {Client.Client.RemoteEndPoint} - запросил {(_spamAllowed ? "отключение" : "подключение")} рассылки.");
@@ -99,6 +101,9 @@ namespace Server.Models.Client
                                 await server.SinglecastMessageAsync($"{request_id}@200@ОК", Id);
                             }
                         }
+                        #endregion
+
+                        #region Auth
                         else if (message.Contains("-auth"))
                         {
                             Log.Information($"Клиент {Client.Client.RemoteEndPoint} - запросил аутентификацию.");
@@ -115,11 +120,13 @@ namespace Server.Models.Client
                             {
                                 Log.Information($"{request_id}@400@Неправильный формат входных данных.");
                                 await server.SinglecastMessageAsync($"{request_id}@400@Неправильный формат входных данных.", Id);
+                                continue;
                             }
                             catch (DatabaseConnectionError)
                             {
                                 Log.Information($"{request_id}@500@Ошибка сервера.");
                                 await server.SinglecastMessageAsync($"{request_id}@500@Ошибка сервера.", Id);
+                                continue;
 
                             }
                             if (IsAuthorized)
@@ -128,6 +135,8 @@ namespace Server.Models.Client
                                 password = userData[3];
                                 Log.Information($"{request_id}@200@Доступ разрешен.");
                                 await server.SinglecastMessageAsync($"{request_id}@200@Доступ разрешен.", Id);
+                                Console.WriteLine($"Клиент {Client.Client.RemoteEndPoint} - прошел аутентификацию.");
+
                             }
                             else
                             {
@@ -136,6 +145,9 @@ namespace Server.Models.Client
                                 Console.WriteLine($"Клиент {Client.Client.RemoteEndPoint} - не прошел аутентификацию.");
                             }
                         }
+                        #endregion
+
+                        #region Reg
                         else if (message.Contains("-reg"))
                         {
                             Log.Information($"Клиент {Client.Client.RemoteEndPoint} - запросил регистрацию.");
@@ -157,6 +169,7 @@ namespace Server.Models.Client
                                 {
                                     Log.Information($"{request_id}@500@Ошибка сервера.");
                                     await server.SinglecastMessageAsync($"{request_id}@500@Ошибка сервера.", Id);
+                                    continue;
                                 }
                                 await server.SinglecastMessageAsync($"{request_id}@201@Пользователь успешно зарегистрирован.", Id);
                                 Log.Information($"{request_id}@201@Пользователь успешно зарегистрирован.");
@@ -174,6 +187,8 @@ namespace Server.Models.Client
                                 {
                                     Log.Information($"{request_id}@400@Логин уже занят.");
                                     await server.SinglecastMessageAsync($"{request_id}@400@Логин уже занят.", Id);
+                                    continue;
+
                                 }
                                 else
                                 {
@@ -193,6 +208,7 @@ namespace Server.Models.Client
                         {
                             await server.SinglecastMessageAsync($"404@404@Ресурс не найден.", Id);
                         }
+                        #endregion
                     }
                     catch
                     {

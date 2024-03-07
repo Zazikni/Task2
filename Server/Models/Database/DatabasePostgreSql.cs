@@ -196,10 +196,15 @@ namespace Models.Database
             {
                 Log.Error($"Ошибка при получении пользователя из базы данных Login: {login}\n{ex.ToString()}");
             }
+            catch (IOException ex)
+            {
+                Log.Error($"Ошибка соеденения с базой данных");
+            }
             catch (Exception ex)
             {
                 Log.Error($"Ошибка при получении пользователя из базы данных Login: {login}\n{ex.ToString()}");
             }
+
             finally
             {
                 await connection.DisposeAsync();
