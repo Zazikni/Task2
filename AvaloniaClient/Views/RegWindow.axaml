@@ -26,22 +26,22 @@
 
 		<StackPanel Classes="base">
 
-			<TextBlock Text="Name" Classes="base" />
-			<TextBox Name="TextBoxName" Classes="base" Watermark="Enter your Name" Text="{Binding Path=Name}"/>
+			<TextBlock Text="Имя" Classes="base" />
+			<TextBox Name="TextBoxName" Classes="base" Watermark="Введите ваше имя" Text="{Binding Path=Name}"/>
 			
-			<TextBlock Text="Login" Classes="base" />
-			<TextBox Name="TextBoxLogin" Classes="base" Watermark="Enter your login" Text="{Binding Path=Login}"/>
+			<TextBlock Text="Логин" Classes="base" />
+			<TextBox Name="TextBoxLogin" Classes="base" Watermark="Введите ваш логин" Text="{Binding Path=Login}"/>
 			
-			<TextBlock Text="Password" Classes="base" />
-			<TextBox Name="TextBoxPassword" Classes="base" Watermark="Enter your password" Text="{Binding Path=Password}"/>
+			<TextBlock Text="Пароль" Classes="base" />
+			<TextBox Name="TextBoxPassword" Classes="base" Watermark="Введите ваш пароль" Text="{Binding Path=Password}"/>
 			
-			<TextBlock Text="Confirm Password" Classes="base" />
-			<TextBox Name="TextBoxConfirmPassword" Classes="base" Watermark="Enter your password"/>
+			<TextBlock Text="Подтверждение пароля" Classes="base" />
+			<TextBox Name="TextBoxConfirmPassword" Classes="base" Watermark="Введите ваш пароль"/>
 			
 			<TextBlock Name="ValidationTextBlock" Foreground="Red" IsVisible="False" Classes="base"/>
 			
-			<Button IsEnabled="{Binding Connection}"   x:Name="ButtonRegister" Content="Register" Command="{Binding RegUserCommand}" Classes="base" />
-			<TextBlock IsVisible="{Binding !Connection}" Classes="error" >Sorry,the server is disabled!</TextBlock>
+			<Button IsEnabled="{Binding Connection}"   Name="ButtonRegister" Content="Зарегистрироваться" Command="{Binding RegUserCommand}" Classes="base" />
+			<TextBlock IsVisible="{Binding !Connection}" Classes="error" >Сервер не доступен!</TextBlock>
 			<TextBlock IsVisible="{Binding ResponseReceived}" Classes="error" Text="{Binding ResponseInfo}" ></TextBlock>
 
 
