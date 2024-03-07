@@ -10,7 +10,7 @@ namespace Server.Models.Client
 {
     internal class ClientObject
     {
-        #region fields
+        #region Fields
 
         private bool _isAuthorized;
 
@@ -43,9 +43,9 @@ namespace Server.Models.Client
 
         private ServerObject server; // объект сервера
 
-        #endregion fields
+        #endregion Fields
 
-        #region constructors
+        #region Constructors
 
         public ClientObject(TcpClient tcpClient, ServerObject serverObject)
         {
@@ -59,9 +59,9 @@ namespace Server.Models.Client
             Writer = new StreamWriter(stream);
         }
 
-        #endregion constructors
+        #endregion Constructors
 
-        #region methods
+        #region Methods
 
         public async Task ProcessAsync()
         {
@@ -170,13 +170,13 @@ namespace Server.Models.Client
                             {
                                 if (ex.Message.Contains("\"users_login_key\""))
                                 {
-                                    Log.Information($"{request_id}@400@Пользователь уже зарегистрирован.");
-                                    await server.SinglecastMessageAsync($"{request_id}@400@Пользователь уже зарегистрирован.", Id);
+                                    Log.Information($"{request_id}@400@Логин уже занят.");
+                                    await server.SinglecastMessageAsync($"{request_id}@400@Логин уже занят.", Id);
                                 }
                                 else
                                 {
-                                    Log.Information($"{request_id}@400@Неправильный формат входных данных.");
-                                    await server.SinglecastMessageAsync($"{request_id}@400@Неправильный формат входных данных.", Id);
+                                    Log.Information($"{request_id}@400@Неправильный формат данных.");
+                                    await server.SinglecastMessageAsync($"{request_id}@400@Неправильный формат данных.", Id);
                                 }
                             }
                             catch (Exception ex)
@@ -221,6 +221,6 @@ namespace Server.Models.Client
             _client.Close();
         }
 
-        #endregion methods
+        #endregion Methods
     }
 }
