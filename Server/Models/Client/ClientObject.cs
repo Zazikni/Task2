@@ -84,19 +84,6 @@ namespace Server.Models.Client
                         {
                             Log.Debug($"Клиент {Client.Client.RemoteEndPoint} - запросил {(_spamAllowed ? "отключение" : "подключение")} рассылки.");
                             int request_id = Convert.ToInt32(message.Remove(9));
-                            //try
-                            //{
-                            //    string[] userData = message.Trim().Split('@');
-
-                            //}
-                            //catch(IndexOutOfRangeException)
-                            //{
-                            //    Log.Information($"{request_id}@400@Неправильный формат входных данных.");
-                            //    await server.SinglecastMessageAsync($"{request_id}@400@Неправильный формат входных данных.", Id);
-                            //}
-                            //catch
-                            //{
-                            //}
 
                             if (!IsAuthorized)
                             {
@@ -129,6 +116,12 @@ namespace Server.Models.Client
                                 Log.Information($"{request_id}@400@Неправильный формат входных данных.");
                                 await server.SinglecastMessageAsync($"{request_id}@400@Неправильный формат входных данных.", Id);
                             }
+                            catch (DatabaseConnectionError)
+                            {
+                                Log.Information($"{request_id}@500@Ошибка сервера.");
+                                await server.SinglecastMessageAsync($"{request_id}@500@Ошибка сервера.", Id);
+
+                            }
                             if (IsAuthorized)
                             {
                                 login = userData[2];
@@ -155,7 +148,16 @@ namespace Server.Models.Client
                                 string new_user_name = userData[2];
                                 string new_user_login = userData[3];
                                 string new_user_password = userData[4];
-                                await DatabasePostgreSql.Instance.AddUser(new NewUser(name: new_user_name, login: new_user_login, password: new_user_password));
+                                try
+                                {
+                                    await DatabasePostgreSql.Instance.AddUser(new NewUser(name: new_user_name, login: new_user_login, password: new_user_password));
+
+                                }
+                                catch (DatabaseConnectionError)
+                                {
+                                    Log.Information($"{request_id}@500@Ошибка сервера.");
+                                    await server.SinglecastMessageAsync($"{request_id}@500@Ошибка сервера.", Id);
+                                }
                                 await server.SinglecastMessageAsync($"{request_id}@201@Пользователь успешно зарегистрирован.", Id);
                                 Log.Information($"{request_id}@201@Пользователь успешно зарегистрирован.");
 
@@ -163,7 +165,7 @@ namespace Server.Models.Client
                             }
                             catch (IndexOutOfRangeException)
                             {
-                                await server.SinglecastMessageAsync("400", Id);
+                                await server.SinglecastMessageAsync($"{request_id}@400@Неправильный формат входных данных.", Id);
                                 continue;
                             }
                             catch (NpgsqlException ex)

@@ -100,9 +100,19 @@ namespace Models.Database
         /// </summary>
         public async Task AddUser(NewUser user)
         {
-            var connection = await _dataSource.OpenConnectionAsync();
+            Log.Debug($"Добавление нового пользователя в базу данных. Login: {user.Login}\tName: {user.Name}");
+
+            NpgsqlConnection connection;
             try
             {
+                connection = await GetConnectionAsync();
+
+            }
+            catch (DatabaseConnectionError ex) { Log.Error(ex.Message); throw new DatabaseConnectionError(ex.Message); }
+
+            try
+            {
+
                 NpgsqlCommand _command = new NpgsqlCommand();
                 _command.CommandText = "INSERT INTO Users (login, name, password) VALUES (@login, @name, @password)";
                 _command.Connection = connection;
@@ -110,22 +120,39 @@ namespace Models.Database
                 _command.Parameters.AddWithValue("@name", user.Name);
                 _command.Parameters.AddWithValue("@password", PasswordHasher.CreateSHA256(user.Password));
                 await _command.ExecuteNonQueryAsync();
-                Log.Debug($"Add new user to database login: {user.Login} \t name: {user.Name}");
             }
             catch (NpgsqlException ex)
             {
-                Log.Error($"Error when adding a new user to Users table name: {user.Name} password: {user.Password} login: {user.Login}\n {ex.Message}");
+                Log.Error($"Ошибка при добавлении пользователя в базу данных Name: {user.Name} Password: {user.Password} Login: {user.Login}\n {ex.Message}");
                 throw ex;
             }
             catch (Exception ex)
             {
-                Log.Error($"Error when adding a new user to Users table name: {user.Name}  password:  {user.Password} login: {user.Login}\n {ex.ToString()}");
+                Log.Error($"Ошибка при добавлении пользователя в базу данных Name: {user.Name} Password: {user.Password} Login: {user.Login}\n {ex.Message}");
                 throw ex;
             }
             finally
             {
                 await connection.DisposeAsync();
             }
+        }
+        private async Task<NpgsqlConnection> GetConnectionAsync()
+        {
+            try
+            {
+                NpgsqlConnection connection = await _dataSource.OpenConnectionAsync();
+                return connection;
+
+            }
+            catch (NpgsqlException ex)
+            {
+                throw new DatabaseConnectionError("Ошибка при подключении к базе данных: " + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                throw new DatabaseConnectionError("Произошла ошибка: " + ex.Message);
+            }
+
         }
 
         /// <summary>
@@ -134,7 +161,13 @@ namespace Models.Database
 
         public async Task<User?> GetUser(string login)
         {
-            var connection = await _dataSource.OpenConnectionAsync();
+            NpgsqlConnection connection;
+            try
+            {
+                connection = await GetConnectionAsync();
+
+            }
+            catch (DatabaseConnectionError ex) { Log.Error(ex.Message); throw new DatabaseConnectionError(ex.Message); }
             try
             {
                 NpgsqlCommand _command = new NpgsqlCommand();
@@ -151,21 +184,21 @@ namespace Models.Database
                     string db_password = (string)reader.GetValue(2);
                     Int64 db_id = Convert.ToInt64(reader.GetValue(3));
 
-                    Log.Debug($"information from database{db_login} \t {db_name} \t {db_password} \t {db_id}");
+                    Log.Debug($"Информация из базы данных {db_login}\t{db_name}\t{db_password}\t{db_id}");
                     return new User(name: db_name, login: db_login, password: db_password, id: db_id);
                 }
                 else
                 {
-                    Log.Warning($"DatabasePostgreSql.GetUser reader.HasRows return False");
+                    Log.Warning($"База данных не вернула никаких данных.");
                 }
             }
             catch (NpgsqlException ex)
             {
-                Log.Error($"Error wile selecting User from table login: {login}\n{ex.ToString()}");
+                Log.Error($"Ошибка при получении пользователя из базы данных Login: {login}\n{ex.ToString()}");
             }
             catch (Exception ex)
             {
-                Log.Error($"Error wile selecting User from table login: {login}\n{ex.ToString()}");
+                Log.Error($"Ошибка при получении пользователя из базы данных Login: {login}\n{ex.ToString()}");
             }
             finally
             {

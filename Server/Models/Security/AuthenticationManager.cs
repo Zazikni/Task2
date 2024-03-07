@@ -1,5 +1,6 @@
 ﻿using Models.Database;
 using Models.Users;
+using Npgsql;
 using Serilog;
 
 namespace Models.Security
@@ -17,7 +18,13 @@ namespace Models.Security
 
         public static async Task<bool> AccessAllowed(string login, string password, IDatabase database)
         {
-            User? user = await database.GetUser(login: login);
+            User? user;
+            try
+            {
+                 user = await database.GetUser(login: login);
+            }
+            catch (DatabaseConnectionError) { throw new DatabaseConnectionError(); }
+
             if (user == null)
             {
                 Log.Information($"User with login: {login} not found.");
