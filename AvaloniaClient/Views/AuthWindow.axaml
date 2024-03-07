@@ -31,6 +31,7 @@
 				<Button IsEnabled="{Binding Connection}"  Name="ButtonLogIn" Content="Войти" Click="button_ButtonLogIn_Click" Command="{Binding AuthUserCommand}" Classes="base" />
 				<Button IsEnabled="{Binding Connection}"  Name="ButtonRegister" Content="Зарегистрироваться" Command="{Binding OpenRegisterWindowCommand}" Classes="base" />
 				<TextBlock IsVisible="{Binding !Connection}" Classes="error" >Сервер не доступен!</TextBlock>
+				<TextBlock IsVisible="{Binding ResponseReceived}" Classes="error" Text="{Binding ResponseInfo}" ></TextBlock>
 
 
 				<!--

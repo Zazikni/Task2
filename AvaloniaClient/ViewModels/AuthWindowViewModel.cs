@@ -12,7 +12,6 @@ namespace AvaloniaClient.ViewModels
     {
         #region Fields
 
-        //private Server _server = Server.Instance;
         private bool _connection;
 
         public bool Connection
@@ -23,7 +22,6 @@ namespace AvaloniaClient.ViewModels
 
         private string _login = string.Empty;
         private string _password = string.Empty;
-        //IDatabase database = DatabasePostgreSql.Instance;
 
         public string Login
         {
@@ -35,6 +33,19 @@ namespace AvaloniaClient.ViewModels
         {
             get { return _password; }
             set { this.RaiseAndSetIfChanged(ref _password, value); }
+        }
+        private string _response_info = String.Empty;
+        private bool _response_received = false;
+        public string ResponseInfo
+        {
+            get => _response_info;
+            set => this.RaiseAndSetIfChanged(ref _response_info, value);
+        }
+
+        public bool ResponseReceived
+        {
+            get => _response_received;
+            set => this.RaiseAndSetIfChanged(ref _response_received, value);
         }
 
         #endregion Fields
@@ -88,7 +99,7 @@ namespace AvaloniaClient.ViewModels
             ConnectionService.Instance.AddRequest(request);
             try
             {
-                response = await ConnectionService.Instance.GetResponseAsync(response_id: request.Id, timeout: TimeSpan.FromSeconds(2));
+                response = await ConnectionService.Instance.GetResponseAsync(response_id: request.Id, timeout: TimeSpan.FromSeconds(4));
             }
             catch (TimeoutException ex)
             {
@@ -103,6 +114,11 @@ namespace AvaloniaClient.ViewModels
                 ConnectionService.Instance.RemoveCallback(RefreshConnectionStatus);
                 WindowManager.CloseRegWindow();
                 WindowManager.SwitchToMainWindow();
+            }
+            else
+            {
+                ResponseReceived = true;
+                ResponseInfo = response.Message;
             }
         }
 
