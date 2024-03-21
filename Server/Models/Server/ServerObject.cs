@@ -15,11 +15,28 @@ namespace Server.Models.Server
         public IDatabase Database
         { get { return _database; } }
 
-        private TcpListener tcpListener = new TcpListener(IPAddress.Any, 8888); // сервер для прослушивания
+        private TcpListener tcpListener; // сервер для прослушивания
         private List<ClientObject> clients = new List<ClientObject>(); // все подключения
         #endregion Fields
 
+        #region Constructor
+        public ServerObject()
+        {
+            if (PortChecker.IsPortAvailable(ConfigurationManager.Instance.RootSettings.Server.Port) == false)
+            {
+                Log.Error($"Порт {ConfigurationManager.Instance.RootSettings.Server.Port} - занят другим приложением.");
+                Environment.Exit(0);
+            }
+            else
+            {
+                Log.Debug($"Порт {ConfigurationManager.Instance.RootSettings.Server.Port} - доступен.");
+                tcpListener = new TcpListener(IPAddress.Any, ConfigurationManager.Instance.RootSettings.Server.Port);
+            }
+        }
+        #endregion Constructor
+
         #region Methods
+
         public async void SpamProcessAsync()
         {
             Console.WriteLine("Рассылка - запущена.");
@@ -54,8 +71,8 @@ namespace Server.Models.Server
             try
             {
                 tcpListener.Start();
-                Log.Information("Сервер запущен. Ожидание подключений...");
-                Console.WriteLine("Сервер запущен. Ожидание подключений...");
+                Log.Information($"Сервер запущен. Сокет: {tcpListener.LocalEndpoint} Ожидание подключений...") ;
+                Console.WriteLine($"Сервер запущен. Сокет: {tcpListener.LocalEndpoint} Ожидание подключений...");
 
                 while (true)
                 {
