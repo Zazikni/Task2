@@ -45,7 +45,7 @@ namespace Server.Models.Server
             string message = "0000@000@Какая-то история о Незнайке.";
             while (true)
             {
-                if (clients.Count != 0)
+                if (clients.Count != 0 & clients.Any(c => c.SpamAllowed))
                 {
                     Console.WriteLine("Рассылка.");
                     Log.Debug("Рассылка.");
@@ -58,8 +58,6 @@ namespace Server.Models.Server
                 }
                 else
                 {
-                    Log.Debug("Сообщения не отправлены -  подключений нет.");
-                    Console.WriteLine("Сообщения не отправлены -  подключений нет.");
                     await Task.Delay(timeout);
                 }
             }
