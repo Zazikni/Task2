@@ -9,7 +9,7 @@
         private string _login;
 
         public string Name
-        { get { return _login; } }
+        { get { return _name; } }
 
         public string Password
         { get { return _password; } }
