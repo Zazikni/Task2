@@ -12,5 +12,15 @@
 	<Design.DataContext>
 		<vm:MainWindowViewModel></vm:MainWindowViewModel>
 	</Design.DataContext>
-	<TextBlock Text="{Binding Message}"></TextBlock>
+	<Window.Styles>
+		<StyleInclude Source="/Styles/BaseWindowStyles.axaml"/>
+	</Window.Styles>
+	<StackPanel>
+		<TextBlock IsVisible="{Binding !Connection}" Classes="error" >Сервер не доступен!</TextBlock>
+		<Button IsVisible="{Binding !Connection}"   Name="ButtonGoToAuthWindow" Content="Вернуться на окно аворизации" Command="{Binding SwitchToAuthWindowCommand}" Classes="base" />
+		<TextBlock Text="{Binding Message}" HorizontalAlignment="Center"></TextBlock>
+
+
+	</StackPanel>
+	
 </Window>
