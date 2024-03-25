@@ -1,0 +1,45 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:ClientForAPI.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="ClientForAPI.Views.AuthWindow"
+        x:DataType="vm:AuthWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="AvaloniaUI"
+		WindowStartupLocation="CenterScreen"
+		>
+	<Design.DataContext>
+		<vm:AuthWindowViewModel></vm:AuthWindowViewModel>
+	</Design.DataContext>
+
+	<Window.Styles>
+		<StyleInclude Source="/Styles/BaseWindowStyles.axaml"/>
+	</Window.Styles>
+
+
+		<Border Classes="base">
+
+			<StackPanel Classes="base">
+
+				<!--<TextBlock Text="Authorization" Classes="base h1" />-->
+				<TextBlock Text="Логин" Classes="base" />
+				<TextBox Name="TextBoxLogin" Classes="base" Watermark="Введите логин" Text="{Binding Path=Login}"/>
+				<TextBlock Text="Пароль" Classes="base" />
+				<TextBox Name="TextBoxPassword" Classes="base" PasswordChar="*" Watermark="Введите пароль" Text="{Binding Path=Password}"/>
+				<Button IsEnabled="{Binding Connection}"  Name="ButtonLogIn" Content="Войти" Click="button_ButtonLogIn_Click" Command="{Binding AuthUserCommand}" Classes="base" />
+				<Button IsEnabled="{Binding Connection}"  Name="ButtonRegister" Content="Зарегистрироваться" Command="{Binding OpenRegisterWindowCommand}" Classes="base" />
+				<TextBlock IsVisible="{Binding !Connection}" Classes="error" >Сервер не доступен!</TextBlock>
+				<TextBlock IsVisible="{Binding ResponseReceived}" Classes="error" Text="{Binding ResponseInfo}" ></TextBlock>
+
+
+				<!--
+						<TextBox Name="input" IsEnabled="False" />
+			<TextBlock IsVisible="{Binding !#input.IsEnabled}">Sorry, no can do!</TextBlock>
+			-->
+			</StackPanel>
+		</Border>
+	
+	
+</Window>

@@ -1,0 +1,85 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<Design.PreviewWith>
+		<Border Padding="20">
+			<!-- Add Controls for Previewer Here -->
+		</Border>
+	</Design.PreviewWith>
+
+	<Style Selector="TextBox.base">
+		<Style Selector="^ /template/ Border#PART_BorderElement">
+			<Setter Property="BorderBrush" Value="White"/>
+		</Style>
+		<Setter Property="Margin" Value="5 2 5 2" />
+		<Setter Property="Padding" Value="5 5 5 5" />
+		<Setter Property="CornerRadius" Value="10" />
+		<Setter Property="Background" Value="White" />
+		<Setter Property="HorizontalAlignment" Value="Stretch" />
+	</Style>
+
+	<!--________________________________________________________________________________________TextBoxTextBlock.base-->
+	<Style Selector="TextBlock.base">
+		<Setter Property="Margin" Value="5 2 5 2" />
+		<Setter Property="Padding" Value="0 0 0 0" />
+		<Setter Property="HorizontalAlignment" Value="Center" />
+	</Style>
+	<!--________________________________________________________________________________________TextBoxTextBlock.base-->
+	<Style Selector="TextBlock.error">
+		<Setter Property="Margin" Value="5 2 5 2" />
+		<Setter Property="Padding" Value="0 0 0 0" />
+		<Setter Property="TextBlock.TextAlignment" Value="Center" />
+		<Setter Property="HorizontalAlignment" Value="Center" />
+
+		<Setter Property="Foreground" Value="Red" />
+
+	</Style>
+
+	<!--________________________________________________________________________________________TextBoxTextBlock.h1-->
+	<Style Selector="TextBlock.h1">
+
+		<Setter Property="Margin" Value="0 0 0 0" />
+	</Style>
+
+	<!--________________________________________________________________________________________Button.base-->
+	<Style Selector="Button.base">
+
+		<Setter Property="Margin" Value="0 2 0 2" />
+		<Setter Property="Padding" Value="3 2 3 2" />
+		<Setter Property="CornerRadius" Value="10" />
+		<Setter Property="HorizontalAlignment" Value="Center" />
+		<Setter Property="Background" Value="#9e9ee2" />
+
+
+		<!--____________________________________________________________________________________Button.base:pointerover-->
+		<Style Selector="^:pointerover /template/ ContentPresenter">
+			<Setter Property="CornerRadius" Value="10" />
+			<Setter Property="TextBlock.Padding" Value="6 2 6 2" />
+			<Setter Property="Background" Value="#9fe2bf" />
+
+		</Style>
+
+		<!--____________________________________________________________________________________Button.base:pressed-->
+		<Style Selector="^:pressed /template/ ContentPresenter">
+		</Style>
+
+	</Style>
+	
+	<!--________________________________________________________________________________________Border.base-->
+	<Style Selector="Border.base">
+		<Setter Property="Margin" Value="0" />
+		<Setter Property="Padding" Value="0" />
+		<Setter Property="Background" Value="Lavender" />
+		<Setter Property="Width" Value="220" />
+		<Setter Property="HorizontalAlignment" Value="Center" />
+		<Setter Property="VerticalAlignment" Value="Center" />
+		<Setter Property="CornerRadius" Value="10" />
+	</Style>
+	
+	<!--________________________________________________________________________________________StackPanel.base-->
+	<Style Selector="StackPanel.base">
+		<Setter Property="Margin" Value="0" />
+		<Setter Property="Width" Value="220" />
+		<Setter Property="HorizontalAlignment" Value="Center" />
+		<Setter Property="VerticalAlignment" Value="Center" />
+	</Style>
+</Styles>
