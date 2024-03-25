@@ -55,35 +55,7 @@ namespace ClientForAPI.ViewModels
 
         #region Tasks
 
-        private async Task GetDataFromServerAsync()
-        {
-            await ServerSpam();
-
-
-            while (true)
-            {
-                try
-                {
-                    string result = await Task.Run(async () =>
-                    {
-                        ServerResponse response = await ConnectionService.Instance.GetResponseAsync(response_id: 0000, timeout: TimeSpan.FromSeconds(20));
-                        return response.Message;
-                    }
-                    );
-
-                    Message += "\n" + result;
-                }
-                catch (SocketException ex)
-                {
-                    Log.Error($"GetDataFromServerAsync {ex.Message}");
-                    WindowManager.SwitchToAuthWindow();
-                    break;
-                }
-
-            }
-            Log.Information($"Получение сообщений из рассылки сервера - закончено.");
-        }
-
+        
         #endregion Tasks
 
         #region Methods
@@ -95,15 +67,6 @@ namespace ClientForAPI.ViewModels
             Connection = false;
 
         }
-        public async Task ServerSpam()
-        {
-            Log.Information($"Получение сообщений из рассылки сервера - запущено.");
-
-            ServerRequest request = new ServerRequest(command: "-spam");
-            ConnectionService.Instance.AddRequest(request);
-            ServerResponse comm_response = await ConnectionService.Instance.GetResponseAsync(response_id: request.Id, timeout: TimeSpan.FromSeconds(2));
-        }
-
         #endregion Methods
 
         #region CommMethods
