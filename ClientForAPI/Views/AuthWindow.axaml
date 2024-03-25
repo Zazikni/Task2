@@ -20,24 +20,47 @@
 
 
 		<Border Classes="base">
+			<StackPanel >
 
 			<StackPanel Classes="base">
 
-				<!--<TextBlock Text="Authorization" Classes="base h1" />-->
 				<TextBlock Text="Логин" Classes="base" />
-				<TextBox Name="TextBoxLogin" Classes="base" Watermark="Введите логин" Text="{Binding Path=Login}"/>
+				<TextBox Name="TextBoxLoginAuth" Classes="base" Watermark="Введите логин" Text="{Binding Path=LoginAuth}"/>
 				<TextBlock Text="Пароль" Classes="base" />
-				<TextBox Name="TextBoxPassword" Classes="base" PasswordChar="*" Watermark="Введите пароль" Text="{Binding Path=Password}"/>
-				<Button IsEnabled="{Binding Connection}"  Name="ButtonLogIn" Content="Войти" Click="button_ButtonLogIn_Click" Command="{Binding AuthUserCommand}" Classes="base" />
-				<Button IsEnabled="{Binding Connection}"  Name="ButtonRegister" Content="Зарегистрироваться" Command="{Binding OpenRegisterWindowCommand}" Classes="base" />
+				<TextBox Name="TextBoxPasswordAuth" Classes="base" PasswordChar="*" Watermark="Введите пароль" Text="{Binding Path=PasswordAuth}"/>
+				<Button IsEnabled="{Binding Connection}"  Name="ButtonLogIn" Content="Войти" Command="{Binding AuthUserCommand}" Classes="base" />
+				<Button IsEnabled="{Binding Connection}"  Name="ButtonSwitchToRegister" Content="Зарегистрироваться" Command="{Binding OpenRegisterWindowCommand}" Classes="base" />
 				<TextBlock IsVisible="{Binding !Connection}" Classes="error" >Сервер не доступен!</TextBlock>
-				<TextBlock IsVisible="{Binding ResponseReceived}" Classes="error" Text="{Binding ResponseInfo}" ></TextBlock>
+				<TextBlock IsVisible="{Binding ResponseReceivedAuth}" Classes="error" Text="{Binding ResponseInfoAuth}" ></TextBlock>
 
 
-				<!--
+			</StackPanel>
+				<StackPanel Classes="base">
+
+					<TextBlock Text="Имя" Classes="base" />
+					<TextBox Name="TextBoxNameReg" Classes="base" Watermark="Введите ваше имя" Text="{Binding Path=NameReg}"/>
+
+					<TextBlock Text="Логин" Classes="base" />
+					<TextBox Name="TextBoxLoginReg" Classes="base" Watermark="Введите ваш логин" Text="{Binding Path=LoginReg}"/>
+
+					<TextBlock Text="Пароль" Classes="base" />
+					<TextBox Name="TextBoxPasswordReg" Classes="base" Watermark="Введите ваш пароль" Text="{Binding Path=PasswordReg}"/>
+
+					<TextBlock Text="Подтверждение пароля" Classes="base" />
+					<TextBox Name="TextBoxConfirmPasswordReg" Classes="base" Watermark="Введите ваш пароль"/>
+
+					<TextBlock Name="ValidationTextBlockReg" Foreground="Red" IsVisible="False" Classes="base"/>
+
+					<Button IsEnabled="{Binding Connection}"   Name="ButtonRegister" Content="Зарегистрироваться" Command="{Binding RegUserCommand}" Classes="base" />
+					<TextBlock IsVisible="{Binding !Connection}" Classes="error" >Сервер не доступен!</TextBlock>
+					<TextBlock IsVisible="{Binding ResponseReceivedReg}" Classes="error" Text="{Binding ResponseInfoReg}" ></TextBlock>
+
+
+					<!--
 						<TextBox Name="input" IsEnabled="False" />
 			<TextBlock IsVisible="{Binding !#input.IsEnabled}">Sorry, no can do!</TextBlock>
 			-->
+				</StackPanel>
 			</StackPanel>
 		</Border>
 	
