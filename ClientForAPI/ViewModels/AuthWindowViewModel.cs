@@ -5,12 +5,16 @@ using ReactiveUI;
 using Serilog;
 using System;
 using System.Reactive;
-
+using System.Reactive.Linq;
 namespace ClientForAPI.ViewModels
 {
     public class AuthWindowViewModel : ViewModelBase
     {
         #region Fields
+        private readonly ObservableAsPropertyHelper<bool> _canShowAuthElement;
+        private readonly ObservableAsPropertyHelper<bool> _canShowRegElement;
+        public bool CanShowAuthElement => _canShowAuthElement.Value;
+        public bool CanShowRegElement => _canShowRegElement.Value;
 
         private bool _connection;
 
@@ -19,6 +23,15 @@ namespace ClientForAPI.ViewModels
             get { return _connection; }
             set { this.RaiseAndSetIfChanged(ref _connection, value); }
         }
+        private bool _contextFlag = true;
+        public bool ContextFlag
+        {
+            get => _contextFlag;
+            set => this.RaiseAndSetIfChanged(ref _contextFlag, value);
+        }
+
+        
+
         #region Auth
         private string _login_auth = string.Empty;
         private string _password_auth = string.Empty;
@@ -98,7 +111,8 @@ namespace ClientForAPI.ViewModels
 
         #region Auth
         public ReactiveCommand<Unit, Unit> AuthUserCommand { get; }
-        public ReactiveCommand<Unit, Unit> OpenRegisterWindowCommand { get; }
+        public ReactiveCommand<Unit, Unit> OpenRegisterFormCommand { get; }
+        public ReactiveCommand<Unit, Unit> OpenAuthFormCommand { get; }
 
         #endregion Auth
 
@@ -120,9 +134,20 @@ namespace ClientForAPI.ViewModels
 
             _connection = ConnectionService.Instance.Client.Connected;
             ConnectionService.Instance.AddCallback(RefreshConnectionStatus);
-            OpenRegisterWindowCommand = ReactiveCommand.Create(OpenRegisterWindow);
+            OpenRegisterFormCommand = ReactiveCommand.Create(OpenRegisterForm);
+            OpenAuthFormCommand = ReactiveCommand.Create(OpenAuthForm);
             AuthUserCommand = ReactiveCommand.Create(AuthUserByLogPass);
             RegUserCommand = ReactiveCommand.Create(RegUser);
+            _canShowAuthElement = this.WhenAnyValue(
+                x => x.Connection, 
+                x => x.ContextFlag, 
+                (connection, contextFlag) => !connection && contextFlag
+                ).ToProperty(this, x => x.CanShowAuthElement);
+            _canShowRegElement = this.WhenAnyValue(
+                x => x.Connection,
+                x => x.ContextFlag,
+                (connection, contextFlag) => !connection && !contextFlag
+                ).ToProperty(this, x => x.CanShowRegElement);
 
         }
 
@@ -131,10 +156,10 @@ namespace ClientForAPI.ViewModels
         #region CommMethods
 
         #region Auth
-        public async void OpenRegisterWindow()
+        public async void OpenRegisterForm()
         {
-            Log.Debug($"Окно аутентификации. Кнопка открытия окна регистрации нажата.");
-            WindowManager.ShowRegWindow();
+            Log.Debug($"Окно аутентификации. Форма аутентификации. Кнопка открытия формы регистрации нажата.");
+            ContextFlag = false;
         }
 
         public async void AuthUserByLogPass()
@@ -224,6 +249,11 @@ namespace ClientForAPI.ViewModels
                 ResponseReceivedReg = true;
                 ResponseInfoReg = response.Message;
             }
+        }
+        public async void OpenAuthForm()
+        {
+            Log.Debug($"Окно аутентификации. Форма регистрации. Кнопка открытия формы аутентификации нажата.");
+            ContextFlag = true;
         }
 
         #endregion Reg

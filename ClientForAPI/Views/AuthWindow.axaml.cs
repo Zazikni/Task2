@@ -24,6 +24,11 @@ namespace ClientForAPI.Views
         #endregion Constructors
 
         #region Methods
+        private async void ClearInfoControlsHandler(object sender, RoutedEventArgs args)
+        {
+            ValidationTextBlockReg.IsVisible  = !ValidationTextBlockReg.IsVisible;
+            TextBlockResponseReceivedAuth.IsVisible = !TextBlockResponseReceivedAuth.IsVisible;
+        }
 
         private async void OnClosing(object sender, System.ComponentModel.CancelEventArgs e)
         {
