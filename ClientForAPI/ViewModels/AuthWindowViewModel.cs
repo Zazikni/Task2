@@ -11,10 +11,6 @@ namespace ClientForAPI.ViewModels
     public class AuthWindowViewModel : ViewModelBase
     {
         #region Fields
-        private readonly ObservableAsPropertyHelper<bool> _canShowAuthElement;
-        private readonly ObservableAsPropertyHelper<bool> _canShowRegElement;
-        public bool CanShowAuthElement => _canShowAuthElement.Value;
-        public bool CanShowRegElement => _canShowRegElement.Value;
 
         private bool _connection;
 
@@ -68,6 +64,7 @@ namespace ClientForAPI.ViewModels
         private string _name_reg;
         private string _login_reg;
         private string _password_reg;
+        private string _confirm_password_reg;
         private string _response_info_reg = String.Empty;
         private bool _response_received_reg = false;
 
@@ -88,12 +85,18 @@ namespace ClientForAPI.ViewModels
             get => _password_reg;
             set => this.RaiseAndSetIfChanged(ref _password_reg, value);
         }
+        public string ConfirmPasswordReg
+        {
+            get => _confirm_password_reg;
+            set => this.RaiseAndSetIfChanged(ref _confirm_password_reg, value);
+        }
 
         public string ResponseInfoReg
         {
             get => _response_info_reg;
             set => this.RaiseAndSetIfChanged(ref _response_info_reg, value);
         }
+
 
         public bool ResponseReceivedReg
         {
@@ -138,16 +141,6 @@ namespace ClientForAPI.ViewModels
             OpenAuthFormCommand = ReactiveCommand.Create(OpenAuthForm);
             AuthUserCommand = ReactiveCommand.Create(AuthUserByLogPass);
             RegUserCommand = ReactiveCommand.Create(RegUser);
-            _canShowAuthElement = this.WhenAnyValue(
-                x => x.Connection, 
-                x => x.ContextFlag, 
-                (connection, contextFlag) => !connection && contextFlag
-                ).ToProperty(this, x => x.CanShowAuthElement);
-            _canShowRegElement = this.WhenAnyValue(
-                x => x.Connection,
-                x => x.ContextFlag,
-                (connection, contextFlag) => !connection && !contextFlag
-                ).ToProperty(this, x => x.CanShowRegElement);
 
         }
 
@@ -164,18 +157,18 @@ namespace ClientForAPI.ViewModels
 
         public async void AuthUserByLogPass()
         {
-            Log.Debug($"Окно аутентификации. Кнопка аутентификации нажата.");
-            Log.Debug($"Окно аутентификации. TextBoxLogin: {LoginAuth}\tTextBoxPassword:{PasswordAuth}");
+            Log.Debug($"Окно аутентификации. Форма аутентификации. Кнопка аутентификации нажата.");
+            Log.Debug($"Окно аутентификации. Форма аутентификации. TextBoxLogin: {LoginAuth}\tTextBoxPassword:{PasswordAuth}");
             ServerResponse response;
             ServerRequest request;
             if (String.IsNullOrEmpty(LoginAuth) || String.IsNullOrEmpty(PasswordAuth))
             {
-                Log.Information($"Окно аутентификации. Данные не введены.");
+                Log.Information($"Окно аутентификации. Форма аутентификации. Форма аутентификации. Данные не введены.");
                 return;
             }
             if (String.IsNullOrWhiteSpace(LoginAuth) || String.IsNullOrWhiteSpace(PasswordAuth))
             {
-                Log.Information($"Окно аутентификации. Данные не введены или состоят из пробелов.");
+                Log.Information($"Окно аутентификации. Форма аутентификации. Данные не введены или состоят из пробелов.");
                 return;
             }
             request = new ServerRequest(command: "-auth", message: $"{LoginAuth}@{PasswordAuth}");
@@ -186,7 +179,7 @@ namespace ClientForAPI.ViewModels
             }
             catch (TimeoutException ex)
             {
-                Log.Information($"Окно аутентификации. Запрос {request.Id} TimeoutException");
+                Log.Information($"Окно аутентификации. Форма аутентификации. Запрос {request.Id} TimeoutException");
                 return;
             }
 
@@ -210,20 +203,20 @@ namespace ClientForAPI.ViewModels
         #region Reg
         public async void RegUser()
         {
-            Log.Debug($"Окно регистрации. Кнопка регистрации нажата.");
-            Log.Debug($"Окно регистрации. TextBoxLogin: {NameReg}\tTextBoxLogin: {LoginReg}\tTextBoxPassword:{PasswordReg}");
+            Log.Debug($"Окно аутентификации. Форма регистрации. Кнопка регистрации нажата.");
+            Log.Debug($"Окно аутентификации. Форма регистрации. TextBoxLogin: {NameReg}\tTextBoxLogin: {LoginReg}\tTextBoxPassword:{PasswordReg}");
 
             ServerResponse response;
             ServerRequest request;
 
             if (String.IsNullOrEmpty(NameReg) || String.IsNullOrEmpty(LoginReg) || String.IsNullOrEmpty(PasswordReg))
             {
-                Log.Information($"Окно регистрации. Данные не введены.");
+                Log.Information($"Окно аутентификации. Форма регистрации. Данные не введены.");
                 return;
             }
             if (String.IsNullOrWhiteSpace(NameReg) || String.IsNullOrWhiteSpace(LoginReg) || String.IsNullOrWhiteSpace(PasswordReg))
             {
-                Log.Information($"Окно регистрации. Данные не введены или состоят из пробелов.");
+                Log.Information($"Окно аутентификации. Форма регистрации. Данные не введены или состоят из пробелов.");
                 return;
             }
             request = new ServerRequest(command: "-reg", message: $"{NameReg}@{LoginReg}@{PasswordReg}");
@@ -234,15 +227,16 @@ namespace ClientForAPI.ViewModels
             }
             catch (TimeoutException ex)
             {
-                Log.Information($"Окно регистрации. Запрос {request.Id} TimeoutException");
+                Log.Information($"Окно аутентификации. Форма регистрации. Запрос {request.Id} TimeoutException");
                 return;
             }
 
             if (response.StatusCode == StatusCodes.CREATED)
             {
-                ConnectionService.Instance.RemoveCallback(RefreshConnectionStatus);
-                //TODO при удалении окна программно возможно программа упадет так как в делегате отснется ссылка на этот метод
-                WindowManager.CloseRegWindow();
+                Log.Information($"Окно аутентификации. Форма регистрации. Пользователь успешно создан, перенаправление на форму аутентификации.");
+                LoginAuth = LoginReg;                
+                ContextFlag = true;
+                ClearRegFields();
             }
             else
             {
@@ -267,6 +261,16 @@ namespace ClientForAPI.ViewModels
         {
             Log.Debug($"Окно аутентификации. Обновление статуса соеденения. Соеденение - {(ConnectionService.Instance.Client.Connected ? "Установлено" : "Потеряно")}");
             Connection = ConnectionService.Instance.Client.Connected;
+        }
+
+        public async void ClearRegFields()
+        {
+            Log.Debug($"Окно аутентификации. Форма регистрации. Очистка полей регистации.");
+            NameReg = String.Empty;
+            LoginReg = String.Empty;
+            PasswordReg = String.Empty;
+            ConfirmPasswordReg = String.Empty;
+
         }
 
 
