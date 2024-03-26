@@ -5,7 +5,7 @@ using ReactiveUI;
 using Serilog;
 using System;
 using System.Reactive;
-
+using System.Reactive.Linq;
 namespace ClientForAPI.ViewModels
 {
     public class AuthWindowViewModel : ViewModelBase
@@ -19,41 +19,113 @@ namespace ClientForAPI.ViewModels
             get { return _connection; }
             set { this.RaiseAndSetIfChanged(ref _connection, value); }
         }
-
-        private string _login = string.Empty;
-        private string _password = string.Empty;
-
-        public string Login
+        private bool _contextFlag = true;
+        public bool ContextFlag
         {
-            get { return _login; }
-            set { this.RaiseAndSetIfChanged(ref _login, value); }
+            get => _contextFlag;
+            set => this.RaiseAndSetIfChanged(ref _contextFlag, value);
         }
 
-        public string Password
+        
+
+        #region Auth
+        private string _login_auth = string.Empty;
+        private string _password_auth = string.Empty;
+
+        public string LoginAuth
         {
-            get { return _password; }
-            set { this.RaiseAndSetIfChanged(ref _password, value); }
-        }
-        private string _response_info = String.Empty;
-        private bool _response_received = false;
-        public string ResponseInfo
-        {
-            get => _response_info;
-            set => this.RaiseAndSetIfChanged(ref _response_info, value);
+            get { return _login_auth; }
+            set { this.RaiseAndSetIfChanged(ref _login_auth, value); }
         }
 
-        public bool ResponseReceived
+        public string PasswordAuth
         {
-            get => _response_received;
-            set => this.RaiseAndSetIfChanged(ref _response_received, value);
+            get { return _password_auth; }
+            set { this.RaiseAndSetIfChanged(ref _password_auth, value); }
         }
+
+        private string _response_info_auth = String.Empty;
+        private bool _response_received_auth = false;
+        public string ResponseInfoAuth
+        {
+            get => _response_info_auth;
+            set => this.RaiseAndSetIfChanged(ref _response_info_auth, value);
+        }
+
+        public bool ResponseReceivedAuth
+        {
+            get => _response_received_auth;
+            set => this.RaiseAndSetIfChanged(ref _response_received_auth, value);
+        }
+
+        #endregion Auth
+
+        #region Reg
+        private string _name_reg;
+        private string _login_reg;
+        private string _password_reg;
+        private string _confirm_password_reg;
+        private string _response_info_reg = String.Empty;
+        private bool _response_received_reg = false;
+
+        public string NameReg
+        {
+            get => _name_reg;
+            set => this.RaiseAndSetIfChanged(ref _name_reg, value);
+        }
+
+        public string LoginReg
+        {
+            get => _login_reg;
+            set => this.RaiseAndSetIfChanged(ref _login_reg, value);
+        }
+
+        public string PasswordReg
+        {
+            get => _password_reg;
+            set => this.RaiseAndSetIfChanged(ref _password_reg, value);
+        }
+        public string ConfirmPasswordReg
+        {
+            get => _confirm_password_reg;
+            set => this.RaiseAndSetIfChanged(ref _confirm_password_reg, value);
+        }
+
+        public string ResponseInfoReg
+        {
+            get => _response_info_reg;
+            set => this.RaiseAndSetIfChanged(ref _response_info_reg, value);
+        }
+
+
+        public bool ResponseReceivedReg
+        {
+            get => _response_received_reg;
+            set => this.RaiseAndSetIfChanged(ref _response_received_reg, value);
+        }
+        #endregion Reg
+
+
 
         #endregion Fields
 
         #region Commands
 
+
+        #region Auth
         public ReactiveCommand<Unit, Unit> AuthUserCommand { get; }
-        public ReactiveCommand<Unit, Unit> OpenRegisterWindowCommand { get; }
+        public ReactiveCommand<Unit, Unit> OpenRegisterFormCommand { get; }
+        public ReactiveCommand<Unit, Unit> OpenAuthFormCommand { get; }
+
+        #endregion Auth
+
+        #region Reg
+
+        public ReactiveCommand<Unit, Unit> RegUserCommand { get; }
+
+        #endregion Reg
+
+
 
         #endregion Commands
 
@@ -65,37 +137,41 @@ namespace ClientForAPI.ViewModels
 
             _connection = ConnectionService.Instance.Client.Connected;
             ConnectionService.Instance.AddCallback(RefreshConnectionStatus);
-            OpenRegisterWindowCommand = ReactiveCommand.Create(OpenRegisterWindow);
+            OpenRegisterFormCommand = ReactiveCommand.Create(OpenRegisterForm);
+            OpenAuthFormCommand = ReactiveCommand.Create(OpenAuthForm);
             AuthUserCommand = ReactiveCommand.Create(AuthUserByLogPass);
+            RegUserCommand = ReactiveCommand.Create(RegUser);
+
         }
 
         #endregion Constructors
 
         #region CommMethods
 
-        public async void OpenRegisterWindow()
+        #region Auth
+        public async void OpenRegisterForm()
         {
-            Log.Debug($"Окно аутентификации. Кнопка открытия окна регистрации нажата.");
-            WindowManager.ShowRegWindow();
+            Log.Debug($"Окно аутентификации. Форма аутентификации. Кнопка открытия формы регистрации нажата.");
+            ContextFlag = false;
         }
 
         public async void AuthUserByLogPass()
         {
-            Log.Debug($"Окно аутентификации. Кнопка аутентификации нажата.");
-            Log.Debug($"Окно аутентификации. TextBoxLogin: {Login}\tTextBoxPassword:{Password}");
+            Log.Debug($"Окно аутентификации. Форма аутентификации. Кнопка аутентификации нажата.");
+            Log.Debug($"Окно аутентификации. Форма аутентификации. TextBoxLogin: {LoginAuth}\tTextBoxPassword:{PasswordAuth}");
             ServerResponse response;
             ServerRequest request;
-            if (String.IsNullOrEmpty(Login) || String.IsNullOrEmpty(Password))
+            if (String.IsNullOrEmpty(LoginAuth) || String.IsNullOrEmpty(PasswordAuth))
             {
-                Log.Information($"Окно аутентификации. Данные не введены.");
+                Log.Information($"Окно аутентификации. Форма аутентификации. Форма аутентификации. Данные не введены.");
                 return;
             }
-            if (String.IsNullOrWhiteSpace(Login) || String.IsNullOrWhiteSpace(Password))
+            if (String.IsNullOrWhiteSpace(LoginAuth) || String.IsNullOrWhiteSpace(PasswordAuth))
             {
-                Log.Information($"Окно аутентификации. Данные не введены или состоят из пробелов.");
+                Log.Information($"Окно аутентификации. Форма аутентификации. Данные не введены или состоят из пробелов.");
                 return;
             }
-            request = new ServerRequest(command: "-auth", message: $"{Login}@{Password}");
+            request = new ServerRequest(command: "-auth", message: $"{LoginAuth}@{PasswordAuth}");
             ConnectionService.Instance.AddRequest(request);
             try
             {
@@ -103,12 +179,12 @@ namespace ClientForAPI.ViewModels
             }
             catch (TimeoutException ex)
             {
-                Log.Information($"Окно аутентификации. Запрос {request.Id} TimeoutException");
+                Log.Information($"Окно аутентификации. Форма аутентификации. Запрос {request.Id} TimeoutException");
                 return;
             }
 
-            Login = String.Empty;
-            Password = String.Empty;
+            LoginAuth = String.Empty;
+            PasswordAuth = String.Empty;
             if (response.StatusCode == StatusCodes.OK)
             {
                 ConnectionService.Instance.RemoveCallback(RefreshConnectionStatus);
@@ -117,19 +193,84 @@ namespace ClientForAPI.ViewModels
             }
             else
             {
-                ResponseReceived = true;
-                ResponseInfo = response.Message;
+                ResponseReceivedAuth = true;
+                ResponseInfoAuth = response.Message;
             }
         }
+
+        #endregion Auth
+
+        #region Reg
+        public async void RegUser()
+        {
+            Log.Debug($"Окно аутентификации. Форма регистрации. Кнопка регистрации нажата.");
+            Log.Debug($"Окно аутентификации. Форма регистрации. TextBoxLogin: {NameReg}\tTextBoxLogin: {LoginReg}\tTextBoxPassword:{PasswordReg}");
+
+            ServerResponse response;
+            ServerRequest request;
+
+            if (String.IsNullOrEmpty(NameReg) || String.IsNullOrEmpty(LoginReg) || String.IsNullOrEmpty(PasswordReg))
+            {
+                Log.Information($"Окно аутентификации. Форма регистрации. Данные не введены.");
+                return;
+            }
+            if (String.IsNullOrWhiteSpace(NameReg) || String.IsNullOrWhiteSpace(LoginReg) || String.IsNullOrWhiteSpace(PasswordReg))
+            {
+                Log.Information($"Окно аутентификации. Форма регистрации. Данные не введены или состоят из пробелов.");
+                return;
+            }
+            request = new ServerRequest(command: "-reg", message: $"{NameReg}@{LoginReg}@{PasswordReg}");
+            ConnectionService.Instance.AddRequest(request);
+            try
+            {
+                response = await ConnectionService.Instance.GetResponseAsync(response_id: request.Id, timeout: TimeSpan.FromSeconds(2));
+            }
+            catch (TimeoutException ex)
+            {
+                Log.Information($"Окно аутентификации. Форма регистрации. Запрос {request.Id} TimeoutException");
+                return;
+            }
+
+            if (response.StatusCode == StatusCodes.CREATED)
+            {
+                Log.Information($"Окно аутентификации. Форма регистрации. Пользователь успешно создан, перенаправление на форму аутентификации.");
+                LoginAuth = LoginReg;                
+                ContextFlag = true;
+                ClearRegFields();
+            }
+            else
+            {
+                ResponseReceivedReg = true;
+                ResponseInfoReg = response.Message;
+            }
+        }
+        public async void OpenAuthForm()
+        {
+            Log.Debug($"Окно аутентификации. Форма регистрации. Кнопка открытия формы аутентификации нажата.");
+            ContextFlag = true;
+        }
+
+        #endregion Reg
 
         #endregion CommMethods
 
         #region Methods
 
+
         public async void RefreshConnectionStatus()
         {
             Log.Debug($"Окно аутентификации. Обновление статуса соеденения. Соеденение - {(ConnectionService.Instance.Client.Connected ? "Установлено" : "Потеряно")}");
             Connection = ConnectionService.Instance.Client.Connected;
+        }
+
+        public async void ClearRegFields()
+        {
+            Log.Debug($"Окно аутентификации. Форма регистрации. Очистка полей регистации.");
+            NameReg = String.Empty;
+            LoginReg = String.Empty;
+            PasswordReg = String.Empty;
+            ConfirmPasswordReg = String.Empty;
+
         }
 
 
