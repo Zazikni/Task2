@@ -16,11 +16,21 @@
 		<StyleInclude Source="/Styles/BaseWindowStyles.axaml"/>
 	</Window.Styles>
 	<StackPanel>
+
+	<StackPanel>
 		<TextBlock IsVisible="{Binding !Connection}" Classes="error" >Сервер не доступен!</TextBlock>
 		<Button IsVisible="{Binding !Connection}"   Name="ButtonGoToAuthWindow" Content="Вернуться на окно аворизации" Command="{Binding SwitchToAuthWindowCommand}" Classes="base" />
-		<TextBlock Text="{Binding Message}" HorizontalAlignment="Center"></TextBlock>
+	</StackPanel>
 
+	<Border Classes="base">
 
+		<StackPanel Classes="base_width_auto">
+			<TextBlock Text="{Binding Message}" Classes="base_min_width"></TextBlock>
+			<Button Name="ButtonLoadFile" Content="Загрузить фото" Command="{Binding LoadFileCommand}" Classes="base" />
+
+		</StackPanel>
+	</Border>
+		
 	</StackPanel>
 	
 </Window>

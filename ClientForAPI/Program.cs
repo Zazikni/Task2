@@ -20,7 +20,7 @@ namespace ClientForAPI
             RootSettings Settings = ConfigurationManager.Instance.RootSettings;
 
             Log.Debug("Запуск сетевого сервиса.");
-            Task.Run(() => Models.Backend.ConnectionService.Instance.Start());
+            Task.Run(() => Models.RemoteServices.AuthenticationService.Instance.Start());
 
             Log.Debug("Запуск приложения.");
             BuildAvaloniaApp()

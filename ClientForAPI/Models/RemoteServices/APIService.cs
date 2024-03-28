@@ -7,7 +7,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace ClientForAPI.Models.Backend
+namespace ClientForAPI.Models.RemoteServices
 {
     public class  FileNotFoundError : Exception
     {

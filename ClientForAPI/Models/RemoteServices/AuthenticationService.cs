@@ -9,21 +9,21 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ClientForAPI.Models.Backend
+namespace ClientForAPI.Models.RemoteServices
 {
-    internal class ConnectionService
+    internal class AuthenticationService
     {
         #region Fields
 
-        private static ConnectionService? _instance = null;
+        private static AuthenticationService? _instance = null;
 
-        public static ConnectionService Instance
+        public static AuthenticationService Instance
         {
             get
             {
                 if (_instance == null)
                 {
-                    _instance = new ConnectionService();
+                    _instance = new AuthenticationService();
                 }
                 return _instance;
             }
@@ -69,7 +69,7 @@ namespace ClientForAPI.Models.Backend
 
         #region Constructor
 
-        private ConnectionService()
+        private AuthenticationService()
         {
             _tcpClient = new TcpClient();
             _delegateChain += SimpleCallbackWhenConnectionResumed;

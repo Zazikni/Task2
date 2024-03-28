@@ -1,22 +1,20 @@
-﻿using ClientForAPI.Models.AnswerManager;
-using ClientForAPI.Models.Backend;
-using ClientForAPI.Models.WindowManager;
+﻿using ClientForAPI.Models.RemoteServices;
+using ClientForAPI.Models.LocalServices;
 using ReactiveUI;
 using Serilog;
-using System;
-using System.Net.Sockets;
+using System.Collections.Generic;
 using System.Reactive;
 using System.Threading.Tasks;
-using System.Xml.Linq;
-using Tmds.DBus.Protocol;
-
+using Avalonia.Controls;
 namespace ClientForAPI.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {
         #region Fields
+        private FileDialogService? FileDialogServiceInstance;
 
-        private string _message = "Wait a bit...";
+
+        private string _message = "Покажу ниже путь к фото.";
         private bool _connection;
 
         public bool Connection
@@ -35,6 +33,7 @@ namespace ClientForAPI.ViewModels
 
         #region Commands
         public ReactiveCommand<Unit, Unit> SwitchToAuthWindowCommand { get; }
+        public ReactiveCommand<Unit, Unit> LoadFileCommand { get; }
 
         #endregion
 
@@ -43,10 +42,11 @@ namespace ClientForAPI.ViewModels
         public MainWindowViewModel()
         {
             Log.Debug($"Создание главного окна.");
-            _connection = ConnectionService.Instance.Client.Connected;
+            _connection = AuthenticationService.Instance.Client.Connected;
 
-            ConnectionService.Instance.AddCallback(RefreshConnectionStatus);
+            AuthenticationService.Instance.AddCallback(RefreshConnectionStatus);
             SwitchToAuthWindowCommand = ReactiveCommand.Create(SwitchToAuthWindow);
+            LoadFileCommand = ReactiveCommand.Create(LoadFile);
 
 
         }
@@ -61,11 +61,22 @@ namespace ClientForAPI.ViewModels
         #region Methods
         public async void RefreshConnectionStatus()
         {
-            Log.Debug($"Главное окно. Обновление статуса соеденения. Соеденение - {(ConnectionService.Instance.Client.Connected ? "Установлено" : "Потеряно")}");
+            Log.Debug($"Главное окно. Обновление статуса соеденения. Соеденение - {(AuthenticationService.Instance.Client.Connected ? "Установлено" : "Потеряно")}");
 
             //Connection = ConnectionService.Instance.Client.Connected;
             Connection = false;
 
+        }
+        private async Task InitFileDialogServiceInstanceIfNotExists()
+        {
+            if (FileDialogServiceInstance == null)
+            {
+                Log.Debug($"Главное окно. Сервис выбора файлов не инициализирован.");
+                FileDialogServiceInstance = new FileDialogService(WindowManagerService.Instance.GetMainWindow);
+                Log.Debug($"Главное окно. Сервис выбора файлов успешно инициализирован.");
+
+                return;
+            }
         }
         #endregion Methods
 
@@ -74,7 +85,22 @@ namespace ClientForAPI.ViewModels
         public async void SwitchToAuthWindow()
         {
             Log.Debug($"Главное окно. Кнопка возврата к авторизации нажата.");
-            WindowManager.SwitchToAuthWindow();
+            WindowManagerService.Instance.SwitchToAuthWindow();
+
+        }
+        public async void LoadFile()
+        {
+            Log.Debug($"Главное окно. Кнопка выбора изображения нажата.");
+            await InitFileDialogServiceInstanceIfNotExists();
+
+            FileDialogFilter filter = new FileDialogFilter { Name = "Image Files", Extensions = new List<string> { "png", "jpg", "jpeg" } };
+            string[] files_to_send = await FileDialogServiceInstance.ShowOpenFileDialogAsync(filter: filter);
+
+            foreach ( string file in files_to_send)
+            {
+                Log.Debug($"Пользователь выбрал файл: {file}");
+                Message += "\n" + file;
+            }
 
         }
         #endregion
