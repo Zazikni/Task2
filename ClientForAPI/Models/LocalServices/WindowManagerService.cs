@@ -1,67 +1,60 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using ClientForAPI.Models.RemoteServices;
 using ClientForAPI.ViewModels;
 using ClientForAPI.Views;
 using Serilog;
 
-namespace ClientForAPI.Models.WindowManager
+namespace ClientForAPI.Models.LocalServices
 {
     /// <summary>
     /// Класс для управления окнами.
     /// </summary>
-    public static class WindowManager
+    public class WindowManagerService
     {
         #region Fields
 
-        private static Window? _reg_window = null;
+        private Window? _reg_window = null;
+        private Window _current_main_window;
+        public Window GetMainWindow { get { return _current_main_window; } }
 
+        private static WindowManagerService? _instance = null;
+
+        public static WindowManagerService Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = new WindowManagerService();
+                }
+                return _instance;
+            }
+        }
         #endregion Fields
+
+        #region Contructors
+        private WindowManagerService()
+        {
+            Log.Information($"Инициализации сервиса управления окнами.");
+            if (Avalonia.Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopLifetime)
+            {
+                _current_main_window = desktopLifetime.MainWindow;
+            }
+
+        }
+
+        #endregion Contructors
 
         #region Methods
 
         /// <summary>
-        /// Метод для открытия окна регистрации.
-        /// </summary>
-        public static void ShowRegWindow()
-        {
-            Log.Information($"Открытие окна регистрации.");
-
-            if (_reg_window == null)
-            {
-                _reg_window = new RegWindow();
-                _reg_window.DataContext = new RegWindowViewModel();
-                _reg_window.Show();
-            }
-        }
-
-        /// <summary>
-        /// Метод для сброса состояния окна регистрации.
-        /// </summary>
-        public static void DropRegWindow()
-        {
-            _reg_window = null;
-        }
-
-        /// <summary>
-        /// Метод для закрытия окна регистрации.
-        /// </summary>
-        public static void CloseRegWindow()
-        {
-            Log.Information($"Закрытие окна регистрации.");
-
-            if (_reg_window != null)
-            {
-                _reg_window.Close(_reg_window.DataContext);
-            }
-        }
-
-        /// <summary>
         /// Метод для закрытия текущего главного окна и переключения на главное (логически) окно программы.
         /// </summary>
-        public static void SwitchToMainWindow()
+        public void SwitchToMainWindow()
         {
             Log.Information($"Переключение на главное окно.");
-            if (App.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopLifetime)
+            if (Avalonia.Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopLifetime)
             {
                 var currentMainWindow = desktopLifetime.MainWindow;
 
@@ -74,10 +67,10 @@ namespace ClientForAPI.Models.WindowManager
             }
         }
 
-        public static void SwitchToAuthWindow()
+        public void SwitchToAuthWindow()
         {
             Log.Information($"Переключение на окно аутентификации.");
-            if (App.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopLifetime)
+            if (Avalonia.Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopLifetime)
             {
                 var currentMainWindow = desktopLifetime.MainWindow;
 

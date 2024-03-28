@@ -1,6 +1,6 @@
 ﻿using ClientForAPI.Models.AnswerManager;
 using ClientForAPI.Models.RemoteServices;
-using ClientForAPI.Models.WindowManager;
+using ClientForAPI.Models.LocalServices;
 using ReactiveUI;
 using Serilog;
 using System;
@@ -188,8 +188,7 @@ namespace ClientForAPI.ViewModels
             if (response.StatusCode == StatusCodes.OK)
             {
                 AuthenticationService.Instance.RemoveCallback(RefreshConnectionStatus);
-                WindowManager.CloseRegWindow();
-                WindowManager.SwitchToMainWindow();
+                WindowManagerService.Instance.SwitchToMainWindow();
             }
             else
             {

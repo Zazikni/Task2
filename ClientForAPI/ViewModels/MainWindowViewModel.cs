@@ -1,5 +1,5 @@
 ﻿using ClientForAPI.Models.RemoteServices;
-using ClientForAPI.Models.WindowManager;
+using ClientForAPI.Models.LocalServices;
 using ReactiveUI;
 using Serilog;
 using System.Collections.Generic;
@@ -76,7 +76,7 @@ namespace ClientForAPI.ViewModels
         public async void SwitchToAuthWindow()
         {
             Log.Debug($"Главное окно. Кнопка возврата к авторизации нажата.");
-            WindowManager.SwitchToAuthWindow();
+            WindowManagerService.Instance.SwitchToAuthWindow();
 
         }
         public async void LoadFile()
