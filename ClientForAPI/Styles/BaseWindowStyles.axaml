@@ -27,7 +27,7 @@
 		<Setter Property="TextAlignment" Value="Center"/>
 
 	</Style>
-	<!--________________________________________________________________________________________TextBoxTextBlock.base-->
+	<!--________________________________________________________________________________________TextBoxTextBlock.base_min_width-->
 	<Style Selector="TextBlock.base_min_width">
 		<Setter Property="Margin" Value="5 2 5 2" />
 		<Setter Property="MinWidth" Value="300" />
@@ -95,7 +95,7 @@
 		<Setter Property="HorizontalAlignment" Value="Center" />
 		<Setter Property="VerticalAlignment" Value="Center" />
 	</Style>
-	<!--________________________________________________________________________________________StackPanel.base-->
+	<!--________________________________________________________________________________________StackPanel.base_width_auto-->
 	<Style Selector="StackPanel.base_width_auto">
 		<Setter Property="Margin" Value="0" />
 		<Setter Property="HorizontalAlignment" Value="Center" />
