@@ -1,5 +1,5 @@
 ﻿using ClientForAPI.Models.AnswerManager;
-using ClientForAPI.Models.Backend;
+using ClientForAPI.Models.RemoteServices;
 using ClientForAPI.Models.WindowManager;
 using ReactiveUI;
 using Serilog;
@@ -135,8 +135,8 @@ namespace ClientForAPI.ViewModels
         {
             Log.Debug($"Создание окна аутентификации.");
 
-            _connection = ConnectionService.Instance.Client.Connected;
-            ConnectionService.Instance.AddCallback(RefreshConnectionStatus);
+            _connection = AuthenticationService.Instance.Client.Connected;
+            AuthenticationService.Instance.AddCallback(RefreshConnectionStatus);
             OpenRegisterFormCommand = ReactiveCommand.Create(OpenRegisterForm);
             OpenAuthFormCommand = ReactiveCommand.Create(OpenAuthForm);
             AuthUserCommand = ReactiveCommand.Create(AuthUserByLogPass);
@@ -172,10 +172,10 @@ namespace ClientForAPI.ViewModels
                 return;
             }
             request = new ServerRequest(command: "-auth", message: $"{LoginAuth}@{PasswordAuth}");
-            ConnectionService.Instance.AddRequest(request);
+            AuthenticationService.Instance.AddRequest(request);
             try
             {
-                response = await ConnectionService.Instance.GetResponseAsync(response_id: request.Id, timeout: TimeSpan.FromSeconds(4));
+                response = await AuthenticationService.Instance.GetResponseAsync(response_id: request.Id, timeout: TimeSpan.FromSeconds(4));
             }
             catch (TimeoutException ex)
             {
@@ -187,7 +187,7 @@ namespace ClientForAPI.ViewModels
             PasswordAuth = String.Empty;
             if (response.StatusCode == StatusCodes.OK)
             {
-                ConnectionService.Instance.RemoveCallback(RefreshConnectionStatus);
+                AuthenticationService.Instance.RemoveCallback(RefreshConnectionStatus);
                 WindowManager.CloseRegWindow();
                 WindowManager.SwitchToMainWindow();
             }
@@ -220,10 +220,10 @@ namespace ClientForAPI.ViewModels
                 return;
             }
             request = new ServerRequest(command: "-reg", message: $"{NameReg}@{LoginReg}@{PasswordReg}");
-            ConnectionService.Instance.AddRequest(request);
+            AuthenticationService.Instance.AddRequest(request);
             try
             {
-                response = await ConnectionService.Instance.GetResponseAsync(response_id: request.Id, timeout: TimeSpan.FromSeconds(2));
+                response = await AuthenticationService.Instance.GetResponseAsync(response_id: request.Id, timeout: TimeSpan.FromSeconds(2));
             }
             catch (TimeoutException ex)
             {
@@ -259,8 +259,8 @@ namespace ClientForAPI.ViewModels
 
         public async void RefreshConnectionStatus()
         {
-            Log.Debug($"Окно аутентификации. Обновление статуса соеденения. Соеденение - {(ConnectionService.Instance.Client.Connected ? "Установлено" : "Потеряно")}");
-            Connection = ConnectionService.Instance.Client.Connected;
+            Log.Debug($"Окно аутентификации. Обновление статуса соеденения. Соеденение - {(AuthenticationService.Instance.Client.Connected ? "Установлено" : "Потеряно")}");
+            Connection = AuthenticationService.Instance.Client.Connected;
         }
 
         public async void ClearRegFields()

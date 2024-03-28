@@ -1,5 +1,5 @@
 ﻿using ClientForAPI.Models.AnswerManager;
-using ClientForAPI.Models.Backend;
+using ClientForAPI.Models.RemoteServices;
 using ClientForAPI.Models.WindowManager;
 using ReactiveUI;
 using Serilog;
@@ -69,9 +69,9 @@ namespace ClientForAPI.ViewModels
         {
             Log.Debug($"Создание окна регистрации.");
 
-            _connection = ConnectionService.Instance.Client.Connected;
+            _connection = AuthenticationService.Instance.Client.Connected;
 
-            ConnectionService.Instance.AddCallback(RefreshConnectionStatus);
+            AuthenticationService.Instance.AddCallback(RefreshConnectionStatus);
             RegUserCommand = ReactiveCommand.Create(RegUser);
         }
 
@@ -98,10 +98,10 @@ namespace ClientForAPI.ViewModels
                 return;
             }
             request = new ServerRequest(command: "-reg", message: $"{Name}@{Login}@{Password}");
-            ConnectionService.Instance.AddRequest(request);
+            AuthenticationService.Instance.AddRequest(request);
             try
             {
-                response = await ConnectionService.Instance.GetResponseAsync(response_id: request.Id, timeout: TimeSpan.FromSeconds(2));
+                response = await AuthenticationService.Instance.GetResponseAsync(response_id: request.Id, timeout: TimeSpan.FromSeconds(2));
             }
             catch (TimeoutException ex)
             {
@@ -111,7 +111,7 @@ namespace ClientForAPI.ViewModels
 
             if (response.StatusCode == StatusCodes.CREATED)
             {
-                ConnectionService.Instance.RemoveCallback(RefreshConnectionStatus);
+                AuthenticationService.Instance.RemoveCallback(RefreshConnectionStatus);
                 //TODO при удалении окна программно возможно программа упадет так как в делегате отснется ссылка на этот метод
                 WindowManager.CloseRegWindow();
             }
@@ -128,8 +128,8 @@ namespace ClientForAPI.ViewModels
 
         public async void RefreshConnectionStatus()
         {
-            Log.Debug($"Окно регистрации. Обновление статуса соеденения. Соеденение - {(ConnectionService.Instance.Client.Connected ? "Установлено" : "Потеряно")}");
-            Connection = ConnectionService.Instance.Client.Connected;
+            Log.Debug($"Окно регистрации. Обновление статуса соеденения. Соеденение - {(AuthenticationService.Instance.Client.Connected ? "Установлено" : "Потеряно")}");
+            Connection = AuthenticationService.Instance.Client.Connected;
         }
 
         #endregion Methods

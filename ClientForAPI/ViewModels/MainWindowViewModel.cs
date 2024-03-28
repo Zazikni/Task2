@@ -1,15 +1,11 @@
-﻿using ClientForAPI.Models.AnswerManager;
-using ClientForAPI.Models.Backend;
+﻿using ClientForAPI.Models.RemoteServices;
 using ClientForAPI.Models.WindowManager;
 using ReactiveUI;
 using Serilog;
-using System;
-using System.Net.Sockets;
+using System.Collections.Generic;
 using System.Reactive;
 using System.Threading.Tasks;
-using System.Xml.Linq;
-using Tmds.DBus.Protocol;
-
+using Avalonia.Controls;
 namespace ClientForAPI.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
@@ -35,6 +31,7 @@ namespace ClientForAPI.ViewModels
 
         #region Commands
         public ReactiveCommand<Unit, Unit> SwitchToAuthWindowCommand { get; }
+        public ReactiveCommand<Unit, Unit> LoadFileCommand { get; }
 
         #endregion
 
@@ -43,10 +40,11 @@ namespace ClientForAPI.ViewModels
         public MainWindowViewModel()
         {
             Log.Debug($"Создание главного окна.");
-            _connection = ConnectionService.Instance.Client.Connected;
+            _connection = AuthenticationService.Instance.Client.Connected;
 
-            ConnectionService.Instance.AddCallback(RefreshConnectionStatus);
+            AuthenticationService.Instance.AddCallback(RefreshConnectionStatus);
             SwitchToAuthWindowCommand = ReactiveCommand.Create(SwitchToAuthWindow);
+            LoadFileCommand = ReactiveCommand.Create(LoadFile);
 
 
         }
@@ -61,10 +59,14 @@ namespace ClientForAPI.ViewModels
         #region Methods
         public async void RefreshConnectionStatus()
         {
-            Log.Debug($"Главное окно. Обновление статуса соеденения. Соеденение - {(ConnectionService.Instance.Client.Connected ? "Установлено" : "Потеряно")}");
+            Log.Debug($"Главное окно. Обновление статуса соеденения. Соеденение - {(AuthenticationService.Instance.Client.Connected ? "Установлено" : "Потеряно")}");
 
             //Connection = ConnectionService.Instance.Client.Connected;
             Connection = false;
+
+        }
+        public async void OpenFileDialogTask()
+        {
 
         }
         #endregion Methods
@@ -75,6 +77,11 @@ namespace ClientForAPI.ViewModels
         {
             Log.Debug($"Главное окно. Кнопка возврата к авторизации нажата.");
             WindowManager.SwitchToAuthWindow();
+
+        }
+        public async void LoadFile()
+        {
+            Log.Debug($"Главное окно. Кнопка выбора изображения нажата.");
 
         }
         #endregion
