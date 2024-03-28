@@ -24,8 +24,8 @@
 
 	<Border Classes="base">
 
-		<StackPanel Classes="base">
-			<TextBlock Text="{Binding Message}" HorizontalAlignment="Center"></TextBlock>
+		<StackPanel Classes="base_width_auto">
+			<TextBlock Text="{Binding Message}" Classes="base_min_width"></TextBlock>
 			<Button Name="ButtonLoadFile" Content="Загрузить фото" Command="{Binding LoadFileCommand}" Classes="base" />
 
 		</StackPanel>

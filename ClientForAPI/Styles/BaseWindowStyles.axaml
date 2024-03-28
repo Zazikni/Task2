@@ -15,6 +15,8 @@
 		<Setter Property="CornerRadius" Value="10" />
 		<Setter Property="Background" Value="White" />
 		<Setter Property="HorizontalAlignment" Value="Stretch" />
+		<Setter Property="TextAlignment" Value="Center"/>
+
 	</Style>
 
 	<!--________________________________________________________________________________________TextBoxTextBlock.base-->
@@ -22,6 +24,18 @@
 		<Setter Property="Margin" Value="5 2 5 2" />
 		<Setter Property="Padding" Value="0 0 0 0" />
 		<Setter Property="HorizontalAlignment" Value="Center" />
+		<Setter Property="TextAlignment" Value="Center"/>
+
+	</Style>
+	<!--________________________________________________________________________________________TextBoxTextBlock.base-->
+	<Style Selector="TextBlock.base_min_width">
+		<Setter Property="Margin" Value="5 2 5 2" />
+		<Setter Property="MinWidth" Value="300" />
+		<Setter Property="Padding" Value="0 0 0 0" />
+		<Setter Property="TextAlignment" Value="Center"/>
+
+		<Setter Property="HorizontalAlignment" Value="Stretch" />
+
 	</Style>
 	<!--________________________________________________________________________________________TextBoxTextBlock.base-->
 	<Style Selector="TextBlock.error">
@@ -43,7 +57,7 @@
 	<!--________________________________________________________________________________________Button.base-->
 	<Style Selector="Button.base">
 
-		<Setter Property="Margin" Value="0 2 0 2" />
+		<Setter Property="Margin" Value="0 2 0 4" />
 		<Setter Property="Padding" Value="3 2 3 2" />
 		<Setter Property="CornerRadius" Value="10" />
 		<Setter Property="HorizontalAlignment" Value="Center" />
@@ -69,7 +83,6 @@
 		<Setter Property="Margin" Value="0" />
 		<Setter Property="Padding" Value="0" />
 		<Setter Property="Background" Value="Lavender" />
-		<Setter Property="Width" Value="220" />
 		<Setter Property="HorizontalAlignment" Value="Center" />
 		<Setter Property="VerticalAlignment" Value="Center" />
 		<Setter Property="CornerRadius" Value="10" />
@@ -79,6 +92,12 @@
 	<Style Selector="StackPanel.base">
 		<Setter Property="Margin" Value="0" />
 		<Setter Property="Width" Value="220" />
+		<Setter Property="HorizontalAlignment" Value="Center" />
+		<Setter Property="VerticalAlignment" Value="Center" />
+	</Style>
+	<!--________________________________________________________________________________________StackPanel.base-->
+	<Style Selector="StackPanel.base_width_auto">
+		<Setter Property="Margin" Value="0" />
 		<Setter Property="HorizontalAlignment" Value="Center" />
 		<Setter Property="VerticalAlignment" Value="Center" />
 	</Style>

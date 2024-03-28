@@ -14,9 +14,12 @@ namespace ClientForAPI.Models.LocalServices
     {
         #region Fields
 
-        private Window? _reg_window = null;
-        private Window _current_main_window;
-        public Window GetMainWindow { get { return _current_main_window; } }
+        private Window? _auth_window = null;
+        public Window GetAuthWindow { get { return _auth_window; } }
+        private Window? _main_window = null;
+        public Window GetMainWindow { get { return _main_window; } }
+
+
 
         private static WindowManagerService? _instance = null;
 
@@ -37,11 +40,6 @@ namespace ClientForAPI.Models.LocalServices
         private WindowManagerService()
         {
             Log.Information($"Инициализации сервиса управления окнами.");
-            if (Avalonia.Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopLifetime)
-            {
-                _current_main_window = desktopLifetime.MainWindow;
-            }
-
         }
 
         #endregion Contructors
@@ -56,14 +54,16 @@ namespace ClientForAPI.Models.LocalServices
             Log.Information($"Переключение на главное окно.");
             if (Avalonia.Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopLifetime)
             {
-                var currentMainWindow = desktopLifetime.MainWindow;
+                var current_main_window = desktopLifetime.MainWindow;
 
-                var newWindow = new MainWindow();
-                newWindow.DataContext = new MainWindowViewModel();
-                newWindow.Show();
+                var new_main_window = new MainWindow();
+                new_main_window.DataContext = new MainWindowViewModel();
+                _main_window = new_main_window;
+                desktopLifetime.MainWindow = new_main_window;
+                new_main_window.Show();
 
-                desktopLifetime.MainWindow = newWindow;
-                currentMainWindow.Close();
+
+                current_main_window.Close();
             }
         }
 
@@ -72,14 +72,15 @@ namespace ClientForAPI.Models.LocalServices
             Log.Information($"Переключение на окно аутентификации.");
             if (Avalonia.Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopLifetime)
             {
-                var currentMainWindow = desktopLifetime.MainWindow;
+                var current_main_window = desktopLifetime.MainWindow;
 
-                var newWindow = new AuthWindow();
-                newWindow.DataContext = new AuthWindowViewModel();
-                newWindow.Show();
+                var new_auth_window = new AuthWindow();
+                new_auth_window.DataContext = new AuthWindowViewModel();
+                new_auth_window.Show();
 
-                desktopLifetime.MainWindow = newWindow;
-                currentMainWindow.Close();
+                _auth_window = new_auth_window;
+                desktopLifetime.MainWindow = new_auth_window;
+                current_main_window.Close();
             }
         }
 

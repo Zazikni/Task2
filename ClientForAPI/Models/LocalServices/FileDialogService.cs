@@ -1,18 +1,24 @@
 ﻿using Avalonia.Controls;
+using Serilog;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ClientForAPI.Models.LocalServices
 {
+    public class EmptySelectionError : Exception
+    {
+        public EmptySelectionError(string message) : base(message)
+        {
+        }
+    }
     internal class FileDialogService
     {
         private readonly Window _owner;
 
         public FileDialogService(Window owner)
         {
+            Log.Information($"Инициализации сервиса выбора файлов.");
+
             _owner = owner;
         }
         public async Task<string[]> ShowOpenFileDialogAsync(FileDialogFilter filter, bool allowMultiple = false)
@@ -30,6 +36,8 @@ namespace ClientForAPI.Models.LocalServices
             var result = await dialog.ShowAsync(_owner);
             if (result == null)
             {
+                Log.Information($"Пользователь ничего не выбрал.");
+
                 return null;
             }
             return result;

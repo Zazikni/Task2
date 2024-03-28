@@ -11,8 +11,10 @@ namespace ClientForAPI.ViewModels
     public class MainWindowViewModel : ViewModelBase
     {
         #region Fields
+        private FileDialogService? FileDialogServiceInstance;
 
-        private string _message = "Wait a bit...";
+
+        private string _message = "Покажу ниже путь к фото.";
         private bool _connection;
 
         public bool Connection
@@ -65,9 +67,16 @@ namespace ClientForAPI.ViewModels
             Connection = false;
 
         }
-        public async void OpenFileDialogTask()
+        private async Task InitFileDialogServiceInstanceIfNotExists()
         {
+            if (FileDialogServiceInstance == null)
+            {
+                Log.Debug($"Главное окно. Сервис выбора файлов не инициализирован.");
+                FileDialogServiceInstance = new FileDialogService(WindowManagerService.Instance.GetMainWindow);
+                Log.Debug($"Главное окно. Сервис выбора файлов успешно инициализирован.");
 
+                return;
+            }
         }
         #endregion Methods
 
@@ -82,6 +91,16 @@ namespace ClientForAPI.ViewModels
         public async void LoadFile()
         {
             Log.Debug($"Главное окно. Кнопка выбора изображения нажата.");
+            await InitFileDialogServiceInstanceIfNotExists();
+
+            FileDialogFilter filter = new FileDialogFilter { Name = "Image Files", Extensions = new List<string> { "png", "jpg", "jpeg" } };
+            string[] files_to_send = await FileDialogServiceInstance.ShowOpenFileDialogAsync(filter: filter);
+
+            foreach ( string file in files_to_send)
+            {
+                Log.Debug($"Пользователь выбрал файл: {file}");
+                Message += "\n" + file;
+            }
 
         }
         #endregion
