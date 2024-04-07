@@ -1,4 +1,4 @@
-﻿using ClientForAPI.Configuration;
+using ClientForAPI.Configuration;
 using Serilog;
 using System;
 using System.IO;
@@ -106,6 +106,31 @@ namespace ClientForAPI.Models.RemoteServices
                 throw e;
             }
 
+
+
+
+
+
+//----------------------
+ public async Task<bool> GetAnswerFromApi()
+        {
+            string URL = "http://" + Host + ":" + Port + "/health";
+
+        
+                HttpResponseMessage response = await _client.GetAsync(URL);
+
+            while(true){
+
+                if( response.StatusCode is System.Net.HttpStatusCode.OK)
+                  {
+                    // все ок 
+
+                   }
+                 else{// тут поднимается крутилка если она нужна }
+                await Task.Delay(//тут задержка);
+            }
+        }
+//----------------------
 
 
         }
